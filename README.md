@@ -29,3 +29,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/yourDb
 spring.datasource.username=yourUsername
 spring.datasource.password=yourPassword
 ```
+
+5. Add following annoation on @Configuration annotated class
+
+```
+@ComponentScan(basePackages = "com.curtisnewbie.module")
+```

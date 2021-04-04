@@ -1,5 +1,7 @@
 package com.curtisnewbie.module.auth.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
  */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
@@ -41,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        logger.info("Configuring AuthenticationProvider using: {}", authProvider.getClass());
         auth.authenticationProvider(authProvider);
     }
 }
