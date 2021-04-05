@@ -1,6 +1,6 @@
 # authmodule
 
-Simple authentication module for internal use
+Simple authentication module for internal use. Only works with HTTPS.
 
 ## To use it:
 
