@@ -31,6 +31,7 @@ public class AccessLogTracker implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException, ServletException {
         logAccessInfoAsync(httpServletRequest, authentication);
+        httpServletResponse.sendRedirect("/index.html");
     }
 
     private void logAccessInfoAsync(HttpServletRequest request, Authentication auth) {
