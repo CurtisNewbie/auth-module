@@ -20,6 +20,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private ApplicationContext applicationContext;
     @Autowired
     private AuthProvider authProvider;
+    @Autowired
+    private AccessLogTracker accessLogTracker;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -30,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
             .formLogin()
                 .loginProcessingUrl("/login")
+                .successHandler(accessLogTracker)
                 .and()
             .logout()
                 .permitAll()

@@ -37,12 +37,13 @@ public class AuthProvider implements AuthenticationProvider {
 
         String username = authentication.getName();
         UserEntity user = userService.loadUserByUsername(username);
-        if (user == null)
+        if (user == null) {
             throw new UsernameNotFoundException("User '" + username + "' not found");
+        }
 
         String password = authentication.getCredentials().toString();
         if (sha256PwEncoder.matches(password.concat(user.getSalt()), user.getPassword())) {
-            return new UsernamePasswordAuthenticationToken(authentication.getName(),
+            return new UsernamePasswordAuthenticationToken(user,
                     authentication.getCredentials(),
                     Arrays.asList(new SimpleGrantedAuthority("ADMIN")));
         }

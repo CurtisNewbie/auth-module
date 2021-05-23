@@ -5,6 +5,8 @@ package com.curtisnewbie.module.auth.dao;
  */
 public class UserEntity {
 
+    private Integer id;
+
     private String username;
 
     private String password;
@@ -34,5 +36,13 @@ public class UserEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }
