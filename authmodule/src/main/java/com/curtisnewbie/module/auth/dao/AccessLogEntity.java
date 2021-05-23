@@ -145,4 +145,15 @@ public class AccessLogEntity {
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
+
+    @Override
+    public String toString() {
+        return "AccessLogEntity{" +
+                "id=" + id +
+                ", accessTime=" + accessTime +
+                ", ipAddress='" + ipAddress + '\'' +
+                ", username='" + username + '\'' +
+                ", userId=" + userId +
+                '}';
+    }
 }

@@ -43,10 +43,13 @@ public class AccessLogTracker implements AuthenticationSuccessHandler {
             accessLogEntity.setUsername(userEntity.getUsername());
         }
         CompletableFuture.runAsync(() -> {
+            logger.info("Logging sign-in info: {}", accessLogEntity.toString());
             accessLogService.save(accessLogEntity);
         }).handle((r, e) -> {
-            logger.error("Unable to save access log", e);
-            return null;
+            if (e != null) {
+                logger.error("Unable to save access log", e);
+            }
+            return r;
         });
     }
 }
