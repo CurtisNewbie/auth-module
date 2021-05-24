@@ -3,9 +3,7 @@ package com.curtisnewbie.module.auth.dao;
 /**
  * @author yongjie.zhuang
  */
-public class UserEntity {
-
-    private Integer id;
+public class RegisterUserDto {
 
     /**
      * username
@@ -13,19 +11,14 @@ public class UserEntity {
     private String username;
 
     /**
-     * password
+     * password (in plain text)
      */
     private String password;
 
     /**
-     * salt
-     */
-    private String salt;
-
-    /**
      * role
      */
-   private String role;
+    private String role;
 
     public String getUsername() {
         return username;
@@ -35,28 +28,12 @@ public class UserEntity {
         this.username = username;
     }
 
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
-    }
-
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getRole() {

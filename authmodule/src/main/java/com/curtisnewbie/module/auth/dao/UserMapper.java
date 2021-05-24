@@ -8,4 +8,10 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMapper {
 
     UserEntity findByUsername(@Param("username") String username);
+
+    void insert(UserEntity userEntity);
+
+    Integer findIdByUsername(@Param("username") String username);
+
+    int countAdmin();
 }
