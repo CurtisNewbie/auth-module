@@ -1,6 +1,6 @@
 package com.curtisnewbie.module.auth.services.impl;
 
-import com.curtisnewbie.module.auth.consts.Role;
+import com.curtisnewbie.module.auth.consts.UserRole;
 import com.curtisnewbie.module.auth.dao.RegisterUserDto;
 import com.curtisnewbie.module.auth.dao.UserEntity;
 import com.curtisnewbie.module.auth.dao.UserMapper;
@@ -62,15 +62,15 @@ public class UserServiceImpl implements UserService {
         }
 
         // make sure the role is either 'admin' or 'guest'
-        if (registerUserDto.getRole().equalsIgnoreCase(Role.ADMIN.val)) {
-            registerUserDto.setRole(Role.ADMIN.val);
+        if (registerUserDto.getRole().equalsIgnoreCase(UserRole.ADMIN.val)) {
+            registerUserDto.setRole(UserRole.ADMIN.val);
         } else {
-            registerUserDto.setRole(Role.GUEST.val);
+            registerUserDto.setRole(UserRole.GUEST.val);
         }
 
         // limit the total number of administrators
         Optional<Integer> optInt = parseInteger(environment.getProperty(ADMIN_LIMIT_COUNT_KEY));
-        if (optInt.isPresent() && registerUserDto.getRole().equals(Role.ADMIN.val)) {
+        if (optInt.isPresent() && registerUserDto.getRole().equals(UserRole.ADMIN.val)) {
             int currCntOfAdmin = userMapper.countAdmin();
             // exceeded the max num of administrators
             if (currCntOfAdmin >= optInt.get()) {

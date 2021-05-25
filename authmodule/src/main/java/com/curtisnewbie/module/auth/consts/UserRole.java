@@ -1,9 +1,11 @@
 package com.curtisnewbie.module.auth.consts;
 
 /**
+ * User's role
+ *
  * @author yongjie.zhuang
  */
-public enum Role {
+public enum UserRole {
 
     ADMIN("admin"),
 
@@ -11,7 +13,7 @@ public enum Role {
 
     public final String val;
 
-    Role(String v) {
+    UserRole(String v) {
         this.val = v;
     }
 }
