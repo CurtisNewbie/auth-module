@@ -45,7 +45,7 @@ public class AuthProvider implements AuthenticationProvider {
         if (sha256PwEncoder.matches(password.concat(user.getSalt()), user.getPassword())) {
             return new UsernamePasswordAuthenticationToken(user,
                     authentication.getCredentials(),
-                    Arrays.asList(new SimpleGrantedAuthority("ADMIN")));
+                    Arrays.asList(new SimpleGrantedAuthority(user.getRole())));
         }
         throw new BadCredentialsException("Incorrect username or password");
     }

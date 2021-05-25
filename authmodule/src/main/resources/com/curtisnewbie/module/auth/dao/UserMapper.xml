@@ -20,7 +20,7 @@
   </select>
 
   <insert id="insert">
-    INSERT INTO (username, password, salt, role)
+    INSERT INTO user (username, password, salt, role)
     VALUES (#{username}, #{password}, #{salt}, #{role})
   </insert>
 </mapper>

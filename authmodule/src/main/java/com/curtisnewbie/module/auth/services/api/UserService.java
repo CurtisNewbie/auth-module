@@ -11,7 +11,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
  */
 public interface UserService {
 
-    UserEntity loadUserByUsername(String s) throws UsernameNotFoundException;
+    /**
+     * Find user by username
+     *
+     * @throws UsernameNotFoundException user with given username is not found
+     */
+    UserEntity loadUserByUsername(String username) throws UsernameNotFoundException;
 
+    /**
+     * Register user of different role
+     *
+     * @param registerUserDto
+     * @throws UserRegisteredException        username is already registered
+     * @throws ExceededMaxAdminCountException the max number of admin exceeded
+     */
     void register(RegisterUserDto registerUserDto) throws UserRegisteredException, ExceededMaxAdminCountException;
 }
