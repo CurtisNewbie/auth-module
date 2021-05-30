@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.curtisnewbie.module.auth.dao.UserMapper">
+  <update id="updatePwd">
+    UPDATE user
+    SET password = #{hashedPwd}
+    WHERE id = #{id}
+  </update>
 
   <select id="findByUsername" resultType="com.curtisnewbie.module.auth.dao.UserEntity">
     SELECT id, username, password, salt, role

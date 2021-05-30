@@ -7,14 +7,13 @@ import com.curtisnewbie.module.auth.dao.UserMapper;
 import com.curtisnewbie.module.auth.exception.ExceededMaxAdminCountException;
 import com.curtisnewbie.module.auth.exception.UserRegisteredException;
 import com.curtisnewbie.module.auth.services.api.UserService;
+import com.curtisnewbie.module.auth.util.PasswordUtil;
 import com.curtisnewbie.module.auth.util.RandomNumUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +28,6 @@ import java.util.Optional;
 @Service
 @Transactional
 public class UserServiceImpl implements UserService {
-
-    private final PasswordEncoder sha256PwEncoder = new MessageDigestPasswordEncoder("SHA-256");
 
     private static final String ADMIN_LIMIT_COUNT_KEY = "admin.count.limit";
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -81,12 +78,17 @@ public class UserServiceImpl implements UserService {
         userMapper.insert(toUserEntity(registerUserDto));
     }
 
+    @Override
+    public void updatePassword(String newPassword, String salt, long id) {
+        userMapper.updatePwd(PasswordUtil.encodePassword(newPassword, salt), id);
+    }
+
     private UserEntity toUserEntity(RegisterUserDto registerUserDto) {
         UserEntity u = new UserEntity();
         u.setUsername(registerUserDto.getUsername());
         u.setRole(registerUserDto.getRole());
         u.setSalt(RandomNumUtil.randomNoStr(5));
-        u.setPassword(sha256PwEncoder.encode(registerUserDto.getPassword() + u.getSalt()));
+        u.setPassword(PasswordUtil.encodePassword(registerUserDto.getPassword(), u.getSalt()));
         return u;
     }
 

@@ -26,4 +26,13 @@ public interface UserService {
      * @throws ExceededMaxAdminCountException the max number of admin exceeded
      */
     void register(RegisterUserDto registerUserDto) throws UserRegisteredException, ExceededMaxAdminCountException;
+
+    /**
+     * Update password
+     *
+     * @param newPassword newPassword
+     * @param salt        salt
+     * @param id          id
+     */
+    void updatePassword(String newPassword, String salt, long id);
 }

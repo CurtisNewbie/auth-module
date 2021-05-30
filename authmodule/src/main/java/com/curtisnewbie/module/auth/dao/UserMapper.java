@@ -14,4 +14,6 @@ public interface UserMapper {
     Integer findIdByUsername(@Param("username") String username);
 
     int countAdmin();
+
+    void updatePwd(@Param("hashedPwd") String hashedPwd, @Param("id") Long id);
 }
