@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
             .formLogin()
                 .loginProcessingUrl("/login")
+                .permitAll()
                 .successHandler(accessLogTracker)
                 .and()
             .logout()
@@ -40,8 +41,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
             .httpBasic()
                 .and()
+            .cors()
+                .disable()
             .csrf()
-                .disable();
+                .disable()
+                ;
+//            .addFilterBefore(new CorsFilter(), LogoutFilter.class);
     }
 
     @Override
@@ -49,4 +54,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         logger.info("Configuring AuthenticationProvider using: {}", authProvider.getClass());
         auth.authenticationProvider(authProvider);
     }
+
+//    static class CorsFilter extends OncePerRequestFilter{
+//
+//        @Override
+//        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//
+//            response.addHeader("Access-Control-Allow-Origin", "*");
+//            response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+//            response.setHeader("Access-Control-Allow-Credentials", "true");
+//            response.setHeader("Access-Control-Allow-Headers",
+//                    "content-type, x-gwt-module-base, x-gwt-permutation, clientid, longpush, set-cookie");
+//            filterChain.doFilter(request, response);
+//        }
+//    }
 }
