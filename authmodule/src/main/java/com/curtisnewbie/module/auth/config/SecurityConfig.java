@@ -22,6 +22,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthProvider authProvider;
     @Autowired
     private AccessLogTracker accessLogTracker;
+    @Autowired
+    private OnAuthFailureHandler onAuthFailureHandler;
+    @Autowired
+    private OnLogoutSuccessHandler onLogoutSuccessHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -31,21 +35,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
             .formLogin()
-                .loginProcessingUrl("/login")
+                .loginPage("/login")
                 .permitAll()
                 .successHandler(accessLogTracker)
+                .failureHandler(onAuthFailureHandler)
                 .and()
             .logout()
                 .permitAll()
                 .logoutUrl("/logout")
+                .logoutSuccessHandler(onLogoutSuccessHandler)
                 .and()
             .httpBasic()
                 .and()
             .cors()
                 .disable()
             .csrf()
-                .disable()
-                ;
+                .disable();
 //            .addFilterBefore(new CorsFilter(), LogoutFilter.class);
     }
 
@@ -55,7 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(authProvider);
     }
 
-//    static class CorsFilter extends OncePerRequestFilter{
+//    static class CorsFilter extends OncePerRequestFilter {
 //
 //        @Override
 //        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
