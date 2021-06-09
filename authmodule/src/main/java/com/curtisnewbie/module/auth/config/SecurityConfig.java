@@ -24,11 +24,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationSuccessHandlerDelegate authenticationSuccessHandlerDelegate;
     @Autowired
-    private AuthenticationFailureHandlerDelegate onAuthFailureHandler;
+    private AuthenticationFailureHandlerDelegate authenticationFailureHandlerDelegate;
     @Autowired
     private OnLogoutSuccessHandler onLogoutSuccessHandler;
     @Value("${permittedAntPatterns:}") // default to "" empty string
-    private String[] permittedAntPatterns = new String[]{};
+    private String[] permittedAntPatterns;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/login")
                 .permitAll()
                 .successHandler(authenticationSuccessHandlerDelegate)
-                .failureHandler(onAuthFailureHandler)
+                .failureHandler(authenticationFailureHandlerDelegate)
                 .and()
             .logout()
                 .permitAll()
