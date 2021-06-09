@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        logger.info("Permit all requests for ant patterns: {}", permittedAntPatterns,toString());
         http
             .authorizeRequests()
                 .antMatchers(permittedAntPatterns).permitAll()
