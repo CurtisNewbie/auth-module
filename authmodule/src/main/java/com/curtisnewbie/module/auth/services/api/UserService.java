@@ -2,9 +2,12 @@ package com.curtisnewbie.module.auth.services.api;
 
 import com.curtisnewbie.module.auth.dao.RegisterUserDto;
 import com.curtisnewbie.module.auth.dao.UserEntity;
+import com.curtisnewbie.module.auth.dao.UserInfo;
 import com.curtisnewbie.module.auth.exception.ExceededMaxAdminCountException;
 import com.curtisnewbie.module.auth.exception.UserRegisteredException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.List;
 
 /**
  * @author yongjie.zhuang
@@ -35,4 +38,9 @@ public interface UserService {
      * @param id          id
      */
     void updatePassword(String newPassword, String salt, long id);
+
+    /**
+     * Fetch list of user info
+     */
+    List<UserInfo> findUserInfoList();
 }

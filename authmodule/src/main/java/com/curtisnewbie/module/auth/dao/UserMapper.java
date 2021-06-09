@@ -2,6 +2,8 @@ package com.curtisnewbie.module.auth.dao;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * @author yongjie.zhuang
  */
@@ -16,4 +18,6 @@ public interface UserMapper {
     int countAdmin();
 
     void updatePwd(@Param("hashedPwd") String hashedPwd, @Param("id") Long id);
+
+    List<UserEntity> findUserInfoList();
 }

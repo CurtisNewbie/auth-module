@@ -23,6 +23,10 @@
     FROM user
     WHERE role = 'admin'
   </select>
+  <select id="findUserInfoList" resultType="com.curtisnewbie.module.auth.dao.UserEntity">
+    SELECT id, username, role
+    FROM user
+  </select>
 
   <insert id="insert">
     INSERT INTO user (username, password, salt, role)
