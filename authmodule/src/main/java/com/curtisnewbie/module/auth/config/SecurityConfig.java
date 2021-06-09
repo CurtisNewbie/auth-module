@@ -23,7 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AccessLogTracker accessLogTracker;
     @Autowired
-    private OnAuthFailureHandler onAuthFailureHandler;
+    private AuthenticationFailureHandlerDelegate onAuthFailureHandler;
     @Autowired
     private OnLogoutSuccessHandler onLogoutSuccessHandler;
 
