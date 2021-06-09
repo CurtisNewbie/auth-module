@@ -7,6 +7,11 @@
     WHERE id = #{id}
   </update>
 
+  <delete id="deleteUserById">
+    DELETE FROM user
+    WHERE id = #{id}
+  </delete>
+
   <select id="findByUsername" resultType="com.curtisnewbie.module.auth.dao.UserEntity">
     SELECT id, username, password, salt, role
     FROM user

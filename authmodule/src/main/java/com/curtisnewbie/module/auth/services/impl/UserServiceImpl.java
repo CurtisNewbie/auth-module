@@ -96,6 +96,11 @@ public class UserServiceImpl implements UserService {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteUserById(int id) {
+        userMapper.deleteUserById(id);
+    }
+
     private UserEntity toUserEntity(RegisterUserDto registerUserDto) {
         UserEntity u = new UserEntity();
         u.setUsername(registerUserDto.getUsername());

@@ -43,4 +43,10 @@ public interface UserService {
      * Fetch list of user info
      */
     List<UserInfo> findUserInfoList();
+
+    /**
+     * Delete user by id
+     * @param id
+     */
+    void deleteUserById(int id);
 }

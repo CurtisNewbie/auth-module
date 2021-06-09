@@ -20,4 +20,6 @@ public interface UserMapper {
     void updatePwd(@Param("hashedPwd") String hashedPwd, @Param("id") Long id);
 
     List<UserEntity> findUserInfoList();
+
+    void deleteUserById(@Param("id") int id);
 }
