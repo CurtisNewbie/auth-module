@@ -3,6 +3,7 @@ package com.curtisnewbie.module.auth.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,13 +27,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationFailureHandlerDelegate onAuthFailureHandler;
     @Autowired
     private OnLogoutSuccessHandler onLogoutSuccessHandler;
+    @Value("${permittedAntPatterns:}") // default to "" empty string
+    private String[] permittedAntPatterns = new String[]{};
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .anyRequest()
-                .authenticated()
+                .antMatchers(permittedAntPatterns).permitAll()
+                .anyRequest().authenticated()
                 .and()
             .formLogin()
                 .loginProcessingUrl("/login")
