@@ -1,6 +1,5 @@
 package com.curtisnewbie.module.auth.config;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ public class AuthenticationFailureHandlerDelegate implements AuthenticationFailu
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
             throws IOException, ServletException {
         if (extender != null) {
-            logger.info("Detected AuthenticationFailureHandlerExtender, calling extender's #onAuthenticationFailure(...)");
+            logger.info("Detected {}, invoking extender's implementation method", AuthenticationFailureHandlerExtender.class.getName());
             extender.onAuthenticationFailure(request, response, exception);
         } else {
             defaultHandler(request, response, exception);
@@ -37,6 +36,6 @@ public class AuthenticationFailureHandlerDelegate implements AuthenticationFailu
 
     private void defaultHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         logger.info("Using Default handler for failed authentication, exception: {}", exception);
-        response.getWriter().write(new JsonMapper().writeValueAsString("Incorrect username or password, please try again."));
+        response.getWriter().write("Incorrect username or password, please try again.");
     }
 }

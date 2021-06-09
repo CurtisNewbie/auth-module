@@ -21,7 +21,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthProvider authProvider;
     @Autowired
-    private AccessLogTracker accessLogTracker;
+    private AuthenticationSuccessHandlerDelegate authenticationSuccessHandlerDelegate;
     @Autowired
     private AuthenticationFailureHandlerDelegate onAuthFailureHandler;
     @Autowired
@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .formLogin()
                 .loginPage("/login")
                 .permitAll()
-                .successHandler(accessLogTracker)
+                .successHandler(authenticationSuccessHandlerDelegate)
                 .failureHandler(onAuthFailureHandler)
                 .and()
             .logout()

@@ -21,16 +21,22 @@ import java.util.concurrent.CompletableFuture;
  * @author yongjie.zhuang
  */
 @Component
-public class AccessLogTracker implements AuthenticationSuccessHandler {
+public class AuthenticationSuccessHandlerDelegate implements AuthenticationSuccessHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AccessLogTracker.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationSuccessHandlerDelegate.class);
     @Autowired
     private AccessLogService accessLogService;
+    @Autowired(required = false)
+    private AuthenticationSuccessHandlerExtender extender;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException, ServletException {
         logAccessInfoAsync(httpServletRequest, authentication);
+        if (extender != null) {
+            logger.info("Detected {}, invoking extender's implementation method", AuthenticationSuccessHandlerExtender.class.getName());
+            extender.onAuthenticationSuccess(httpServletRequest, httpServletResponse, authentication);
+        }
     }
 
     private void logAccessInfoAsync(HttpServletRequest request, Authentication auth) {
@@ -43,7 +49,10 @@ public class AccessLogTracker implements AuthenticationSuccessHandler {
             accessLogEntity.setUsername(userEntity.getUsername());
         }
         CompletableFuture.runAsync(() -> {
-            logger.info("Logging sign-in info: {}", accessLogEntity.toString());
+            logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
+                    accessLogEntity.getId(),
+                    accessLogEntity.getUsername(),
+                    accessLogEntity.getUserId());
             accessLogService.save(accessLogEntity);
         }).handle((r, e) -> {
             if (e != null) {

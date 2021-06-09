@@ -15,7 +15,6 @@ public class AccessLogServiceImpl implements AccessLogService {
     @Autowired
     private AccessLogMapper m;
 
-
     @Override
     public void save(AccessLogEntity accessLogEntity) {
         m.insert(accessLogEntity);
