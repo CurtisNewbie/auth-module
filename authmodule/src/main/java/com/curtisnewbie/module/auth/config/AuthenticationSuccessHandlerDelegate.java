@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,12 +30,18 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
     @Autowired(required = false)
     private AuthenticationSuccessHandlerExtender extender;
 
+    @PostConstruct
+    void postConstruct(){
+        if (extender != null) {
+            logger.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
+        }
+    }
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException, ServletException {
         logAccessInfoAsync(httpServletRequest, authentication);
         if (extender != null) {
-            logger.info("Detected {}, invoking extender's implementation method", AuthenticationSuccessHandlerExtender.class.getName());
             extender.onAuthenticationSuccess(httpServletRequest, httpServletResponse, authentication);
         }
     }

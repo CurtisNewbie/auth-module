@@ -7,6 +7,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,11 +24,17 @@ public class AuthenticationFailureHandlerDelegate implements AuthenticationFailu
     @Autowired(required = false)
     private AuthenticationFailureHandlerExtender extender;
 
+    @PostConstruct
+    void postConstruct(){
+        if (extender != null) {
+            logger.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
+        }
+    }
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception)
             throws IOException, ServletException {
         if (extender != null) {
-            logger.info("Detected {}, invoking extender's implementation method", AuthenticationFailureHandlerExtender.class.getName());
             extender.onAuthenticationFailure(request, response, exception);
         } else {
             defaultHandler(request, response, exception);
