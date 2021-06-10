@@ -33,11 +33,25 @@ public final class AuthUtil {
     /**
      * Get username
      *
-     * @throws InvalidAuthenticationException when it's unable to get {@code Authentication} object; or the {@code
-     *                                        Principal} object is null or not instance of {@code UserEntity}
+     * @throws InvalidAuthenticationException when the authentication is invalid
      */
     public static String getUsername() {
-        return getUserEntity().getUsername();
+        String n = getUserEntity().getUsername();
+        if (n == null)
+            throw new InvalidAuthenticationException("UserEntity's username is null");
+        return n;
+    }
+
+    /**
+     * Get userId
+     *
+     * @throws InvalidAuthenticationException when the authentication is invalid
+     */
+    public static Integer getUserId() {
+        Integer id = getUserEntity().getId();
+        if (id == null)
+            throw new InvalidAuthenticationException("UserEntity's id is null");
+        return id;
     }
 
 }
