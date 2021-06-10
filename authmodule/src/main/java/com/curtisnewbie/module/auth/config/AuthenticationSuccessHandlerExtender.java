@@ -11,6 +11,5 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
  *
  * @author yongjie.zhuang
  */
-
 public interface AuthenticationSuccessHandlerExtender extends AuthenticationSuccessHandler {
 }

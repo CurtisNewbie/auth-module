@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationFailureHandlerDelegate authenticationFailureHandlerDelegate;
     @Autowired
-    private OnLogoutSuccessHandler onLogoutSuccessHandler;
+    private LogoutSuccessHandlerDelegate logoutSuccessHandlerDelegate;
     @Value("${permittedAntPatterns:}") // default to "" empty string
     private String[] permittedAntPatterns;
 
@@ -47,7 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .logout()
                 .permitAll()
                 .logoutUrl("/logout")
-                .logoutSuccessHandler(onLogoutSuccessHandler)
+                .logoutSuccessHandler(logoutSuccessHandlerDelegate)
                 .and()
             .cors()
                 .disable()
