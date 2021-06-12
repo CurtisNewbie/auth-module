@@ -1,5 +1,7 @@
 package com.curtisnewbie.module.auth.dao;
 
+import com.curtisnewbie.module.auth.consts.UserRole;
+
 /**
  * @author yongjie.zhuang
  */
@@ -18,7 +20,7 @@ public class RegisterUserDto {
     /**
      * role
      */
-    private String role;
+    private UserRole role;
 
     public String getUsername() {
         return username;
@@ -36,11 +38,11 @@ public class RegisterUserDto {
         this.password = password;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 }

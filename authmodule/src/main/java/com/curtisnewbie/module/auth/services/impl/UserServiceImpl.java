@@ -62,13 +62,6 @@ public class UserServiceImpl implements UserService {
             throw new UserRegisteredException(registerUserDto.getUsername());
         }
 
-        // make sure the role is either 'admin' or 'guest'
-        if (registerUserDto.getRole().equalsIgnoreCase(UserRole.ADMIN.val)) {
-            registerUserDto.setRole(UserRole.ADMIN.val);
-        } else {
-            registerUserDto.setRole(UserRole.GUEST.val);
-        }
-
         // limit the total number of administrators
         Optional<Integer> optInt = parseInteger(environment.getProperty(ADMIN_LIMIT_COUNT_KEY));
         if (optInt.isPresent() && registerUserDto.getRole().equals(UserRole.ADMIN.val)) {
@@ -104,7 +97,7 @@ public class UserServiceImpl implements UserService {
     private UserEntity toUserEntity(RegisterUserDto registerUserDto) {
         UserEntity u = new UserEntity();
         u.setUsername(registerUserDto.getUsername());
-        u.setRole(registerUserDto.getRole());
+        u.setRole(registerUserDto.getRole().val);
         u.setSalt(RandomNumUtil.randomNoStr(5));
         u.setPassword(PasswordUtil.encodePassword(registerUserDto.getPassword(), u.getSalt()));
         return u;
