@@ -9,14 +9,49 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
 /**
+ * Configuration class for WebSecurity
+ * <p>
+ * Designed with extensibility in mind, for custom implementation of AuthenticationSuccessHandler,
+ * AuthenticationFailureHandler, and LogoutSuccessHandler, see {@link AuthenticationSuccessHandlerExtender}, {@link
+ * AuthenticationFailureHandlerExtender} and {@link LogoutSuccessHandlerExtender}
+ * </p>
+ * <p>
+ * For custom configuration of HttpSecurity, overrides default value with properties.
+ * <ul>
+ *     <li>{@link #VALUE_PERMITTED_ANT_PATTERNS} an array of ant patterns permitted by all requests</li>
+ *     <li>{@link #VALUE_PERMIT_ALL_CORS} boolean value, indicating whether it should add a filter allowing all origins</li>
+ *     <li>{@link #VALUE_LOGIN_PROCESSING_URL} custom login processing url</li>
+ *     <li>{@link #VALUE_CUSTOM_LOGIN_PAGE} url of custom login page</li>
+ *     <li>{@link #VALUE_LOGOUT_URL} logout url</li>
+ * </ul>
+ * </p>
+ *
  * @author yongjie.zhuang
  */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+    private static final String DEFAULT_LOGIN_PROCESSING_URL = "/login";
+    private static final String DEFAULT_LOGOUT_URL = "/logout";
+    private static final String CUSTOM_LOGIN_PAGE_NOT_SET = "----";
+    private static final String EMPTY_STRING = "";
+    private static final String VALUE_PERMITTED_ANT_PATTERNS = "authmodule.permitted-ant-patterns";
+    private static final String VALUE_PERMIT_ALL_CORS = "authmodule.permit-all-CORS";
+    private static final String VALUE_LOGIN_PROCESSING_URL = "authmodule.login-processing-url";
+    private static final String VALUE_CUSTOM_LOGIN_PAGE = "authmodule.custom-login-page";
+    private static final String VALUE_LOGOUT_URL = "authmodule.logout-url";
+
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
@@ -27,33 +62,58 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationFailureHandlerDelegate authenticationFailureHandlerDelegate;
     @Autowired
     private LogoutSuccessHandlerDelegate logoutSuccessHandlerDelegate;
-    @Value("${permittedAntPatterns:}") // default to "" empty string
+    @Value("${" + VALUE_PERMITTED_ANT_PATTERNS + ":" + EMPTY_STRING + "}") // default to "" empty string
     private String[] permittedAntPatterns;
+    @Value("${" + VALUE_PERMIT_ALL_CORS + ":false}") // default to false
+    private boolean permitAllCORS;
+    @Value("${" + VALUE_LOGIN_PROCESSING_URL + ":" + DEFAULT_LOGIN_PROCESSING_URL + "}")
+    private String loginProcessingUrl;
+    @Value("${" + VALUE_CUSTOM_LOGIN_PAGE + ":" + CUSTOM_LOGIN_PAGE_NOT_SET + "}")
+    private String customLoginPage;
+    @Value("${" + VALUE_LOGOUT_URL + ":" + DEFAULT_LOGOUT_URL + "}")
+    private String logoutUrl;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        logger.info("Permit all requests for ant patterns: {}", permittedAntPatterns,toString());
+        // setup which requests are permitted and which requests require authentication
         http
-            .authorizeRequests()
+                .authorizeRequests()
                 .antMatchers(permittedAntPatterns).permitAll()
-                .anyRequest().authenticated()
-                .and()
-            .formLogin()
-                .loginProcessingUrl("/login")
+                .anyRequest().authenticated();
+        logger.info("Permit all requests for ant patterns: {}", permittedAntPatterns, toString());
+
+        // setup the processing url, success handle (delegate) and failure handler (delegate)
+        http.formLogin()
                 .permitAll()
+                .loginProcessingUrl(loginProcessingUrl)
                 .successHandler(authenticationSuccessHandlerDelegate)
-                .failureHandler(authenticationFailureHandlerDelegate)
-                .and()
-            .logout()
+                .failureHandler(authenticationFailureHandlerDelegate);
+        logger.info("Setup login processing url: {}", loginProcessingUrl);
+
+        // if customLoginPage is present, use the custom one instead of the generated one
+        if (!customLoginPage.equals(CUSTOM_LOGIN_PAGE_NOT_SET)) {
+            logger.info("Using custom login page: {}", customLoginPage);
+            http.formLogin()
+                    .loginPage(customLoginPage);
+        }
+
+        // setup logoutUrl and logout success handler (delegate)
+        http.logout()
                 .permitAll()
-                .logoutUrl("/logout")
-                .logoutSuccessHandler(logoutSuccessHandlerDelegate)
-                .and()
-            .cors()
+                .logoutUrl(logoutUrl)
+                .logoutSuccessHandler(logoutSuccessHandlerDelegate);
+        logger.info("Setup logout url: {}", logoutUrl);
+
+        http.cors()
                 .disable()
-            .csrf()
+                .csrf()
                 .disable();
-//            .addFilterBefore(new CorsFilter(), LogoutFilter.class);
+
+        if (permitAllCORS) {
+            CorsFilter corsFilter = new CorsFilter();
+            logger.info("Adding CORS filter: {}", corsFilter.toString());
+            http.addFilterBefore(corsFilter, LogoutFilter.class);
+        }
     }
 
     @Override
@@ -62,17 +122,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(authProvider);
     }
 
-//    static class CorsFilter extends OncePerRequestFilter {
-//
-//        @Override
-//        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//
-//            response.addHeader("Access-Control-Allow-Origin", "*");
-//            response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-//            response.setHeader("Access-Control-Allow-Credentials", "true");
-//            response.setHeader("Access-Control-Allow-Headers",
-//                    "content-type, x-gwt-module-base, x-gwt-permutation, clientid, longpush, set-cookie");
-//            filterChain.doFilter(request, response);
-//        }
-//    }
+    static class CorsFilter extends OncePerRequestFilter {
+
+        private String allowOrigin = "*";
+        private String allowMethods = "POST, GET, OPTIONS";
+        private String allowCredentials = "true";
+        private String allowHeaders = "content-type, x-gwt-module-base, x-gwt-permutation, clientid, longpush, set-cookie";
+
+        @Override
+        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+            response.addHeader("Access-Control-Allow-Origin", allowOrigin);
+            response.setHeader("Access-Control-Allow-Methods", allowMethods);
+            response.setHeader("Access-Control-Allow-Credentials", allowCredentials);
+            response.setHeader("Access-Control-Allow-Headers", allowHeaders);
+            filterChain.doFilter(request, response);
+        }
+
+        @Override
+        public String toString() {
+            return "CorsFilter{" +
+                    "allowOrigin='" + allowOrigin + '\'' +
+                    ", allowMethods='" + allowMethods + '\'' +
+                    ", allowCredentials='" + allowCredentials + '\'' +
+                    ", allowHeaders='" + allowHeaders + '\'' +
+                    '}';
+        }
+    }
 }
