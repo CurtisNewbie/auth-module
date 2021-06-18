@@ -2,6 +2,7 @@ package com.curtisnewbie.module.auth.dao;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,5 +22,5 @@ public interface UserMapper {
 
     List<UserEntity> findUserInfoList();
 
-    void deleteUserById(@Param("id") int id);
+    void disableUserById(@Param("id") int id, @Param("disabledBy") String disabledBy, @Param("disableTime") Date disableTime);
 }

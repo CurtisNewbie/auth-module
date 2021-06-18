@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -90,8 +91,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUserById(int id) {
-        userMapper.deleteUserById(id);
+    public void disabledUserById(int id, String disabledBy) {
+        userMapper.disableUserById(id, disabledBy, new Date());
     }
 
     private UserEntity toUserEntity(RegisterUserDto registerUserDto) {
@@ -100,6 +101,8 @@ public class UserServiceImpl implements UserService {
         u.setRole(registerUserDto.getRole().val);
         u.setSalt(RandomNumUtil.randomNoStr(5));
         u.setPassword(PasswordUtil.encodePassword(registerUserDto.getPassword(), u.getSalt()));
+        u.setCreateBy(registerUserDto.getCreateBy());
+        u.setCreateTime(new Date());
         return u;
     }
 

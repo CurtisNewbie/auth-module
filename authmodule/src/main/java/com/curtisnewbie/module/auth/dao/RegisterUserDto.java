@@ -22,6 +22,11 @@ public class RegisterUserDto {
      */
     private UserRole role;
 
+    /**
+     * create by
+     */
+    private String createBy;
+
     public String getUsername() {
         return username;
     }
@@ -44,5 +49,13 @@ public class RegisterUserDto {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
     }
 }

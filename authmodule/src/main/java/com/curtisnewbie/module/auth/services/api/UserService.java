@@ -46,7 +46,9 @@ public interface UserService {
 
     /**
      * Delete user by id
+     *
      * @param id
+     * @param disabledBy
      */
-    void deleteUserById(int id);
+    void disabledUserById(int id, String disabledBy);
 }
