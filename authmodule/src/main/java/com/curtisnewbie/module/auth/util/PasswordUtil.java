@@ -55,9 +55,13 @@ public final class PasswordUtil {
 
         /**
          * The password that is being validated (which is the one user entered)
+         *
+         * @param password the password provided by the user
+         * @param salt     the salt of the user
          */
-        public PasswordValidator givenPassword(String password) {
+        public PasswordValidator givenPasswordAndSalt(String password, String salt) {
             this.pwdValidated = password;
+            this.salt = salt;
             return this;
         }
 
@@ -66,14 +70,6 @@ public final class PasswordUtil {
          */
         public PasswordValidator compareTo(String pwdInDb) {
             this.correctPwd = pwdInDb;
-            return this;
-        }
-
-        /**
-         * Using salt
-         */
-        public PasswordValidator withSalt(String salt) {
-            this.salt = salt;
             return this;
         }
 

@@ -41,8 +41,7 @@ public class AuthProvider implements AuthenticationProvider {
 
         String password = authentication.getCredentials().toString();
         boolean isPasswordMatched = PasswordUtil.getValidator()
-                .givenPassword(password)
-                .withSalt(user.getSalt())
+                .givenPasswordAndSalt(password, user.getSalt())
                 .compareTo(user.getPassword())
                 .isMatched();
         if (isPasswordMatched) {
