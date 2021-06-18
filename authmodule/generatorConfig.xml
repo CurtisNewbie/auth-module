@@ -31,7 +31,7 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
 
-        <table tableName="access_log" mapperName="AccessLogMapper" domainObjectName="AccessLogEntity">
+        <table tableName="user" mapperName="UserMapper" domainObjectName="UserEntity">
             <property name="enableSelectByExample" value="false"/>
             <property name="enableDeleteByExample" value="false"/>
             <property name="enableCountByExample" value="false"/>
