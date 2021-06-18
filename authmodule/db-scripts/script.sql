@@ -5,9 +5,10 @@ CREATE TABLE IF NOT EXISTS user (
     salt VARCHAR(10) NOT NULL COMMENT "salt",
     role VARCHAR(20) NOT NULL COMMENT "role",
     create_time DATETIME NOT NULL DEFAULT NOW() COMMENT 'when the user is created',
-    is_disabled INT NOT NULL COMMENT 'whether the user is disabled, 0-normal, 1-disabled',
+    create_by VARCHAR(255) NOT NULL COMMENT 'who created this user',
+    is_disabled INT NOT NULL DEFAULT 0 COMMENT 'whether the user is disabled, 0-normal, 1-disabled',
     disable_time DATETIME COMMENT 'the date when the user is disabled',
-    disable_by VARCHAR(255) COMMENT 'who disable this user'
+    disable_by VARCHAR(255) COMMENT 'who disabled this user'
 ) ENGINE=InnoDB COMMENT 'user';
 
 CREATE TABLE IF NOT EXISTS access_log (
@@ -24,6 +25,8 @@ CREATE TABLE IF NOT EXISTS access_log (
 -- for upgrading 19/06/2021
 ALTER TABLE user MODIFY COLUMN username VARCHAR(255) NOT NULL UNIQUE COMMENT "username (must be unique)";
 ALTER TABLE user ADD COLUMN create_time DATETIME NOT NULL DEFAULT NOW() COMMENT 'when the user is created';
-ALTER TABLE user ADD COLUMN is_disabled INT NOT NULL COMMENT 'whether the user is disabled, 0-normal, 1-disabled';
+ALTER TABLE user ADD COLUMN create_by VARCHAR(255) NOT NULL COMMENT 'who created this user';
+ALTER TABLE user ADD COLUMN is_disabled INT NOT NULL DEFAULT 0 COMMENT 'whether the user is disabled, 0-normal, 1-disabled';
 ALTER TABLE user ADD COLUMN disable_time DATETIME COMMENT 'the date when the user is disabled';
 ALTER TABLE user ADD COLUMN disable_by VARCHAR(255) COMMENT 'who disable this user';
+
