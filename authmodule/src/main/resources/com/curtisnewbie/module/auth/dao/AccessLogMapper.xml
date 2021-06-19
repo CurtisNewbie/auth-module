@@ -60,5 +60,6 @@
   <select id="selectAllBasicInfo" resultType="com.curtisnewbie.module.auth.dao.AccessLogEntity">
     select access_time, ip_address, username, user_id
     from access_log
+    order by id desc
   </select>
 </mapper>
