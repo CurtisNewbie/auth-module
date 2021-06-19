@@ -35,4 +35,6 @@ public interface AccessLogMapper {
      * @mbg.generated Sun May 23 23:31:27 CST 2021
      */
     int updateByPrimaryKey(AccessLogEntity record);
+
+    List<AccessLogEntity> selectAllBasicInfo();
 }
