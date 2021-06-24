@@ -2,7 +2,11 @@ package com.curtisnewbie.module.auth.dao;
 
 import java.util.Date;
 
-/** Users and global privileges */
+/**
+ * User entity
+ *
+ * @author yongjie.zhuang
+ */
 public class UserEntity {
     /** primary key */
     private Integer id;
