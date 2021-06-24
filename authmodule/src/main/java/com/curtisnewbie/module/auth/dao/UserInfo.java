@@ -19,6 +19,9 @@ public class UserInfo {
      */
     private String role;
 
+    /** whether the user is disabled, 0-normal, 1-disabled */
+    private Integer isDisabled;
+
     public Integer getId() {
         return id;
     }
@@ -41,5 +44,13 @@ public class UserInfo {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public Integer getIsDisabled() {
+        return isDisabled;
+    }
+
+    public void setIsDisabled(Integer isDisabled) {
+        this.isDisabled = isDisabled;
     }
 }

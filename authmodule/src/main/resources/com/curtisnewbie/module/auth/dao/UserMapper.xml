@@ -40,10 +40,15 @@
   </select>
 
   <!-- disabled users are not included -->
-  <select id="findUserInfoList" resultType="com.curtisnewbie.module.auth.dao.UserEntity">
+  <select id="findNormalUserInfoList" resultType="com.curtisnewbie.module.auth.dao.UserEntity">
     SELECT id, username, role
     FROM user
     WHERE is_disabled = 0
+  </select>
+
+  <select id="findAllUserInfoList" resultType="com.curtisnewbie.module.auth.dao.UserEntity">
+    SELECT id, username, role, is_disabled
+    FROM user
   </select>
 
   <insert id="insert">

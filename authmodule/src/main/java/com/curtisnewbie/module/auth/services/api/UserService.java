@@ -40,9 +40,14 @@ public interface UserService {
     void updatePassword(String newPassword, String salt, long id);
 
     /**
-     * Fetch list of user info
+     * Fetch list of user info, excluding disabled users
      */
-    List<UserInfo> findUserInfoList();
+    List<UserInfo> findNormalUserInfoList();
+
+    /**
+     * Fetch list of user info, including disabled users
+     */
+    List<UserInfo> findAllUserInfoList();
 
     /**
      * Delete user by id

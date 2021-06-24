@@ -1,5 +1,6 @@
 package com.curtisnewbie.module.auth.services.impl;
 
+import com.curtisnewbie.common.util.BeanCopyUtils;
 import com.curtisnewbie.module.auth.consts.UserRole;
 import com.curtisnewbie.module.auth.dao.RegisterUserDto;
 import com.curtisnewbie.module.auth.dao.UserEntity;
@@ -12,7 +13,6 @@ import com.curtisnewbie.module.auth.util.PasswordUtil;
 import com.curtisnewbie.module.auth.util.RandomNumUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * @author yongjie.zhuang
@@ -82,12 +81,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserInfo> findUserInfoList() {
-        return userMapper.findUserInfoList().stream().map(ue -> {
-            UserInfo ui = new UserInfo();
-            BeanUtils.copyProperties(ue, ui);
-            return ui;
-        }).collect(Collectors.toList());
+    public List<UserInfo> findNormalUserInfoList() {
+        return BeanCopyUtils.toTypeList(userMapper.findNormalUserInfoList(), UserInfo.class);
+    }
+
+    @Override
+    public List<UserInfo> findAllUserInfoList() {
+        return BeanCopyUtils.toTypeList(userMapper.findAllUserInfoList(), UserInfo.class);
     }
 
     @Override
