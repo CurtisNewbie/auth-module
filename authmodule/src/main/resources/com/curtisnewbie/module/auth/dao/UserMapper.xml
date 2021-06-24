@@ -13,9 +13,17 @@
   <update id="disableUserById">
     UPDATE user
     SET is_disabled = 1,
-    disable_by = #{disabledBy},
-    disable_time = #{disableTime}
+    update_by = #{disabledBy},
+    update_time = #{disableTime}
     WHERE id = #{id} AND is_disabled = 0
+  </update>
+
+  <update id="enableUserById">
+    UPDATE user
+    SET is_disabled = 0,
+    update_by = #{enabledBy},
+    update_time = #{enableTime}
+    WHERE id = #{id} AND is_disabled = 1
   </update>
 
   <select id="findByUsername" resultType="com.curtisnewbie.module.auth.dao.UserEntity">

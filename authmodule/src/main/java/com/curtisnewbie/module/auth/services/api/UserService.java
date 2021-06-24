@@ -50,10 +50,18 @@ public interface UserService {
     List<UserInfo> findAllUserInfoList();
 
     /**
-     * Delete user by id
+     * Disable user by id
      *
      * @param id
      * @param disabledBy
      */
-    void disabledUserById(int id, String disabledBy);
+    void disableUserById(int id, String disabledBy);
+
+    /**
+     * Enable user by id
+     *
+     * @param id
+     * @param enabledBy
+     */
+    void enableUserById(int id, String enabledBy);
 }

@@ -2,11 +2,7 @@ package com.curtisnewbie.module.auth.dao;
 
 import java.util.Date;
 
-/**
- * User entity
- *
- * @author yongjie.zhuang
- */
+/** Users and global privileges */
 public class UserEntity {
     /** primary key */
     private Integer id;
@@ -26,14 +22,14 @@ public class UserEntity {
     /** when the user is created */
     private Date createTime;
 
-    /** the date when the user is disabled */
-    private Date disableTime;
+    /** when the user is updated */
+    private Date updateTime;
 
     /** whether the user is disabled, 0-normal, 1-disabled */
     private Integer isDisabled;
 
-    /** who disabled this user */
-    private String disableBy;
+    /** who updated this user */
+    private String updateBy;
 
     /** who created this user */
     private String createBy;
@@ -86,12 +82,12 @@ public class UserEntity {
         this.createTime = createTime;
     }
 
-    public Date getDisableTime() {
-        return disableTime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setDisableTime(Date disableTime) {
-        this.disableTime = disableTime;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     public Integer getIsDisabled() {
@@ -102,12 +98,12 @@ public class UserEntity {
         this.isDisabled = isDisabled;
     }
 
-    public String getDisableBy() {
-        return disableBy;
+    public String getUpdateBy() {
+        return updateBy;
     }
 
-    public void setDisableBy(String disableBy) {
-        this.disableBy = disableBy == null ? null : disableBy.trim();
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy == null ? null : updateBy.trim();
     }
 
     public String getCreateBy() {

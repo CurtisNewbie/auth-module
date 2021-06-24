@@ -60,4 +60,13 @@ public interface UserMapper {
      * @param disableTime the time when this user is disabled
      */
     void disableUserById(@Param("id") int id, @Param("disabledBy") String disabledBy, @Param("disableTime") Date disableTime);
+
+    /**
+     * Set user enabled
+     *
+     * @param id         id
+     * @param enabledBy  who disabled this user
+     * @param enableTime the time when this user is disabled
+     */
+    void enableUserById(@Param("id") int id, @Param("enabledBy") String enabledBy, @Param("enableTime") Date enableTime);
 }

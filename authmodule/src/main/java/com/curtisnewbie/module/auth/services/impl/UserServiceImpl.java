@@ -91,8 +91,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void disabledUserById(int id, String disabledBy) {
+    public void disableUserById(int id, String disabledBy) {
         userMapper.disableUserById(id, disabledBy, new Date());
+    }
+
+    @Override
+    public void enableUserById(int id, String enabledBy) {
+        userMapper.enableUserById(id, enabledBy, new Date());
     }
 
     private UserEntity toUserEntity(RegisterUserDto registerUserDto) {
