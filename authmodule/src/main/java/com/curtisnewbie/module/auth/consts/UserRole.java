@@ -1,13 +1,16 @@
 package com.curtisnewbie.module.auth.consts;
 
+import com.curtisnewbie.common.enums.ValueEnum;
+import com.curtisnewbie.common.util.EnumUtils;
+
 import java.util.Objects;
 
 /**
- * User's role
+ * User's role enum
  *
  * @author yongjie.zhuang
  */
-public enum UserRole {
+public enum UserRole implements ValueEnum<UserRole, String> {
 
     /** Administrator */
     ADMIN("admin"),
@@ -18,7 +21,7 @@ public enum UserRole {
     /** Guest */
     GUEST("guest");
 
-    public final String val;
+    private final String val;
 
     UserRole(String v) {
         this.val = v;
@@ -26,11 +29,11 @@ public enum UserRole {
 
     public static UserRole parseUserRole(String userRole) {
         Objects.requireNonNull(userRole);
-        for (UserRole u : UserRole.values()) {
-            if (Objects.equals(u.val, userRole)) {
-                return u;
-            }
-        }
-        return null;
+        return EnumUtils.parse(userRole, UserRole.class);
+    }
+
+    @Override
+    public String getValue() {
+        return this.val;
     }
 }

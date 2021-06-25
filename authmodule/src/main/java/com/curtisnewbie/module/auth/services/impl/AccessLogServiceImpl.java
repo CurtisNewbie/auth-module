@@ -3,9 +3,9 @@ package com.curtisnewbie.module.auth.services.impl;
 import com.curtisnewbie.common.util.BeanCopyUtils;
 import com.curtisnewbie.common.vo.PagingVo;
 import com.curtisnewbie.module.auth.dao.AccessLogEntity;
-import com.curtisnewbie.module.auth.dao.AccessLogInfo;
 import com.curtisnewbie.module.auth.dao.AccessLogMapper;
 import com.curtisnewbie.module.auth.services.api.AccessLogService;
+import com.curtisnewbie.module.auth.vo.AccessLogInfoVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +29,10 @@ public class AccessLogServiceImpl implements AccessLogService {
     }
 
     @Override
-    public PageInfo<AccessLogInfo> findAccessLogInfoByPage(PagingVo paging) {
+    public PageInfo<AccessLogInfoVo> findAccessLogInfoByPage(PagingVo paging) {
         Objects.requireNonNull(paging);
         PageHelper.startPage(paging.getPage(), paging.getLimit());
         List<AccessLogEntity> list = m.selectAllBasicInfo();
-        return BeanCopyUtils.toPageList(PageInfo.of(list), AccessLogInfo.class);
+        return BeanCopyUtils.toPageList(PageInfo.of(list), AccessLogInfoVo.class);
     }
 }

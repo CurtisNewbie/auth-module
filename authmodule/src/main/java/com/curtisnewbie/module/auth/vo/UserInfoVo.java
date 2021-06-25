@@ -1,11 +1,11 @@
-package com.curtisnewbie.module.auth.dao;
+package com.curtisnewbie.module.auth.vo;
 
 /**
  * Basic info of user
  *
  * @author yongjie.zhuang
  */
-public class UserInfo {
+public class UserInfoVo {
 
     private Integer id;
 

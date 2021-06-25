@@ -5,7 +5,7 @@ package com.curtisnewbie.module.auth.exception;
  *
  * @author yongjie.zhuang
  */
-public class ExceededMaxAdminCountException extends Exception {
+public class ExceededMaxAdminCountException extends UserRelatedException {
 
     public ExceededMaxAdminCountException(String msg) {
         super(msg);

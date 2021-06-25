@@ -2,15 +2,14 @@ package com.curtisnewbie.module.auth.services.impl;
 
 import com.curtisnewbie.common.util.BeanCopyUtils;
 import com.curtisnewbie.module.auth.consts.UserRole;
-import com.curtisnewbie.module.auth.dao.RegisterUserDto;
 import com.curtisnewbie.module.auth.dao.UserEntity;
-import com.curtisnewbie.module.auth.dao.UserInfo;
 import com.curtisnewbie.module.auth.dao.UserMapper;
-import com.curtisnewbie.module.auth.exception.ExceededMaxAdminCountException;
-import com.curtisnewbie.module.auth.exception.UserRegisteredException;
+import com.curtisnewbie.module.auth.exception.*;
 import com.curtisnewbie.module.auth.services.api.UserService;
 import com.curtisnewbie.module.auth.util.PasswordUtil;
 import com.curtisnewbie.module.auth.util.RandomNumUtil;
+import com.curtisnewbie.module.auth.vo.RegisterUserVo;
+import com.curtisnewbie.module.auth.vo.UserInfoVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,19 +51,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void register(RegisterUserDto registerUserDto) throws UserRegisteredException, ExceededMaxAdminCountException {
-        Objects.requireNonNull(registerUserDto);
-        Objects.requireNonNull(registerUserDto.getUsername());
-        Objects.requireNonNull(registerUserDto.getPassword());
-        Objects.requireNonNull(registerUserDto.getRole());
+    public void register(RegisterUserVo registerUserVo) throws UserRegisteredException, ExceededMaxAdminCountException {
+        Objects.requireNonNull(registerUserVo);
+        Objects.requireNonNull(registerUserVo.getUsername());
+        Objects.requireNonNull(registerUserVo.getPassword());
+        Objects.requireNonNull(registerUserVo.getRole());
 
-        if (userMapper.findIdByUsername(registerUserDto.getUsername()) != null) {
-            throw new UserRegisteredException(registerUserDto.getUsername());
+        if (userMapper.findIdByUsername(registerUserVo.getUsername()) != null) {
+            throw new UserRegisteredException(registerUserVo.getUsername());
         }
 
         // limit the total number of administrators
         Optional<Integer> optInt = parseInteger(environment.getProperty(ADMIN_LIMIT_COUNT_KEY));
-        if (optInt.isPresent() && registerUserDto.getRole().equals(UserRole.ADMIN.val)) {
+        if (optInt.isPresent() && registerUserVo.getRole().equals(UserRole.ADMIN.getValue())) {
             int currCntOfAdmin = userMapper.countAdmin();
             // exceeded the max num of administrators
             if (currCntOfAdmin >= optInt.get()) {
@@ -72,22 +71,36 @@ public class UserServiceImpl implements UserService {
                         optInt.get(), currCntOfAdmin));
             }
         }
-        userMapper.insert(toUserEntity(registerUserDto));
+        userMapper.insert(toUserEntity(registerUserVo));
     }
 
     @Override
-    public void updatePassword(String newPassword, String salt, long id) {
-        userMapper.updatePwd(PasswordUtil.encodePassword(newPassword, salt), id);
+    public void updatePassword(final String newPassword, final String oldPassword, long id) throws UserNotFoundException,
+            PasswordIncorrectException {
+        UserEntity ue = userMapper.findById(id);
+        if (ue == null) {
+            throw new UserNotFoundException("user.id: " + id);
+        }
+        boolean isPasswordMatched = PasswordUtil.getValidator()
+                .givenPasswordAndSalt(oldPassword, ue.getSalt())
+                .compareTo(ue.getPassword())
+                .isMatched();
+        if (!isPasswordMatched) {
+            throw new PasswordIncorrectException("user.id: " + id);
+        }
+        userMapper.updatePwd(PasswordUtil.encodePassword(newPassword, ue.getSalt()), id);
     }
 
     @Override
-    public List<UserInfo> findNormalUserInfoList() {
-        return BeanCopyUtils.toTypeList(userMapper.findNormalUserInfoList(), UserInfo.class);
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public List<UserInfoVo> findNormalUserInfoList() {
+        return BeanCopyUtils.toTypeList(userMapper.findNormalUserInfoList(), UserInfoVo.class);
     }
 
     @Override
-    public List<UserInfo> findAllUserInfoList() {
-        return BeanCopyUtils.toTypeList(userMapper.findAllUserInfoList(), UserInfo.class);
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public List<UserInfoVo> findAllUserInfoList() {
+        return BeanCopyUtils.toTypeList(userMapper.findAllUserInfoList(), UserInfoVo.class);
     }
 
     @Override
@@ -100,13 +113,13 @@ public class UserServiceImpl implements UserService {
         userMapper.enableUserById(id, enabledBy, new Date());
     }
 
-    private UserEntity toUserEntity(RegisterUserDto registerUserDto) {
+    private UserEntity toUserEntity(RegisterUserVo registerUserVo) {
         UserEntity u = new UserEntity();
-        u.setUsername(registerUserDto.getUsername());
-        u.setRole(registerUserDto.getRole().val);
+        u.setUsername(registerUserVo.getUsername());
+        u.setRole(registerUserVo.getRole().getValue());
         u.setSalt(RandomNumUtil.randomNoStr(5));
-        u.setPassword(PasswordUtil.encodePassword(registerUserDto.getPassword(), u.getSalt()));
-        u.setCreateBy(registerUserDto.getCreateBy());
+        u.setPassword(PasswordUtil.encodePassword(registerUserVo.getPassword(), u.getSalt()));
+        u.setCreateBy(registerUserVo.getCreateBy());
         u.setCreateTime(new Date());
         return u;
     }

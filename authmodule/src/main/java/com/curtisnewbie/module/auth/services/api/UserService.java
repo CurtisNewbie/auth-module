@@ -1,15 +1,16 @@
 package com.curtisnewbie.module.auth.services.api;
 
-import com.curtisnewbie.module.auth.dao.RegisterUserDto;
 import com.curtisnewbie.module.auth.dao.UserEntity;
-import com.curtisnewbie.module.auth.dao.UserInfo;
-import com.curtisnewbie.module.auth.exception.ExceededMaxAdminCountException;
-import com.curtisnewbie.module.auth.exception.UserRegisteredException;
+import com.curtisnewbie.module.auth.exception.*;
+import com.curtisnewbie.module.auth.vo.RegisterUserVo;
+import com.curtisnewbie.module.auth.vo.UserInfoVo;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
 /**
+ * Service related to user table
+ *
  * @author yongjie.zhuang
  */
 public interface UserService {
@@ -24,30 +25,33 @@ public interface UserService {
     /**
      * Register user of different role
      *
-     * @param registerUserDto
+     * @param registerUserVo
      * @throws UserRegisteredException        username is already registered
      * @throws ExceededMaxAdminCountException the max number of admin exceeded
      */
-    void register(RegisterUserDto registerUserDto) throws UserRegisteredException, ExceededMaxAdminCountException;
+    void register(RegisterUserVo registerUserVo) throws UserRegisteredException, ExceededMaxAdminCountException;
 
     /**
      * Update password
      *
-     * @param newPassword newPassword
-     * @param salt        salt
+     * @param newPassword new password (in plain text)
+     * @param oldPassword old password (in plain text)
      * @param id          id
+     * @throws UserNotFoundException      when the user with the given id is not found
+     * @throws PasswordIncorrectException when the old password is incorrect
      */
-    void updatePassword(String newPassword, String salt, long id);
+    void updatePassword(String newPassword, String oldPassword, long id) throws UserNotFoundException,
+            PasswordIncorrectException;
 
     /**
      * Fetch list of user info, excluding disabled users
      */
-    List<UserInfo> findNormalUserInfoList();
+    List<UserInfoVo> findNormalUserInfoList();
 
     /**
      * Fetch list of user info, including disabled users
      */
-    List<UserInfo> findAllUserInfoList();
+    List<UserInfoVo> findAllUserInfoList();
 
     /**
      * Disable user by id

@@ -1,19 +1,16 @@
-package com.curtisnewbie.module.auth.dao;
+package com.curtisnewbie.module.auth.vo;
 
 import lombok.Data;
 
 import java.util.Date;
 
 /**
- * access_log entity
+ * Access log info vo
  *
  * @author yongjie.zhuang
  */
 @Data
-public class AccessLogEntity {
-
-    /** primary key */
-    private Integer id;
+public class AccessLogInfoVo {
 
     /** when the user signed in */
     private Date accessTime;

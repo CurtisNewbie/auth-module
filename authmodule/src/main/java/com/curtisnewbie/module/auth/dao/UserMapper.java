@@ -69,4 +69,11 @@ public interface UserMapper {
      * @param enableTime the time when this user is disabled
      */
     void enableUserById(@Param("id") int id, @Param("enabledBy") String enabledBy, @Param("enableTime") Date enableTime);
+
+    /**
+     * Select *
+     *
+     * @param id id
+     */
+    UserEntity findById(@Param("id") long id);
 }
