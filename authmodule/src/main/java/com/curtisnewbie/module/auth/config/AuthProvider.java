@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Customer authentication provider
+ * Custom authentication provider
  *
  * @author yongjie.zhuang
  */
