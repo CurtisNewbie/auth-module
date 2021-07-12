@@ -2,6 +2,7 @@ package com.curtisnewbie.module.auth.util;
 
 import com.curtisnewbie.module.auth.dao.UserEntity;
 import com.curtisnewbie.module.auth.exception.InvalidAuthenticationException;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -28,6 +29,25 @@ public final class AuthUtil {
         if (auth.getPrincipal() == null || !(auth.getPrincipal() instanceof UserEntity))
             throw new InvalidAuthenticationException("Authentication#principal is null or not instance of UserEntity");
         return UserEntity.class.cast(auth.getPrincipal());
+    }
+
+    /**
+     * Check if current user's authentication's principal is present
+     *
+     * @param targetPrincipalType (optional) target type of the principal, this param checks whether the target type is
+     *                            is assignable from the Principal's class; if not, this method returns false
+     */
+    public static boolean isPrincipalPresent(@Nullable Class<?> targetPrincipalType) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null)
+            return false;
+        if (auth.getPrincipal() == null) {
+            return false;
+        }
+        if (targetPrincipalType != null)
+            return targetPrincipalType.isAssignableFrom(auth.getPrincipal().getClass());
+        else
+            return true;
     }
 
     /**
