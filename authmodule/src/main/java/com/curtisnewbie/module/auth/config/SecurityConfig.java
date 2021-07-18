@@ -10,13 +10,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import javax.servlet.Filter;
 
 
 /**
@@ -30,11 +25,13 @@ import java.io.IOException;
  * For custom configuration of HttpSecurity, overrides default value with properties.
  * <ul>
  *     <li>{@link #VALUE_PERMITTED_ANT_PATTERNS} an array of ant patterns permitted by all requests</li>
- *     <li>{@link #VALUE_PERMIT_ALL_CORS} boolean value, indicating whether it should add a filter allowing all origins</li>
  *     <li>{@link #VALUE_LOGIN_PROCESSING_URL} custom login processing url</li>
  *     <li>{@link #VALUE_CUSTOM_LOGIN_PAGE} url of custom login page</li>
  *     <li>{@link #VALUE_LOGOUT_URL} logout url</li>
  * </ul>
+ * </p>
+ * <p>
+ * For more on CORS filter, see {@link CorsConfig}
  * </p>
  *
  * @author yongjie.zhuang
@@ -47,7 +44,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String CUSTOM_LOGIN_PAGE_NOT_SET = "----";
     private static final String EMPTY_STRING = "";
     private static final String VALUE_PERMITTED_ANT_PATTERNS = "authmodule.permitted-ant-patterns";
-    private static final String VALUE_PERMIT_ALL_CORS = "authmodule.permit-all-CORS";
     private static final String VALUE_LOGIN_PROCESSING_URL = "authmodule.login-processing-url";
     private static final String VALUE_CUSTOM_LOGIN_PAGE = "authmodule.custom-login-page";
     private static final String VALUE_LOGOUT_URL = "authmodule.logout-url";
@@ -62,10 +58,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationFailureHandlerDelegate authenticationFailureHandlerDelegate;
     @Autowired
     private LogoutSuccessHandlerDelegate logoutSuccessHandlerDelegate;
+    @Autowired
+    private CorsConfig corsConfig;
+
+
     @Value("${" + VALUE_PERMITTED_ANT_PATTERNS + ":" + EMPTY_STRING + "}") // default to "" empty string
     private String[] permittedAntPatterns;
-    @Value("${" + VALUE_PERMIT_ALL_CORS + ":false}") // default to false
-    private boolean permitAllCORS;
     @Value("${" + VALUE_LOGIN_PROCESSING_URL + ":" + DEFAULT_LOGIN_PROCESSING_URL + "}")
     private String loginProcessingUrl;
     @Value("${" + VALUE_CUSTOM_LOGIN_PAGE + ":" + CUSTOM_LOGIN_PAGE_NOT_SET + "}")
@@ -77,8 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // setup which requests are permitted and which requests require authentication
         http
-                .authorizeRequests()
-                .antMatchers(permittedAntPatterns).permitAll()
+                .authorizeRequests().antMatchers(permittedAntPatterns).permitAll()
                 .anyRequest().authenticated();
         logger.info("Permit all requests for ant patterns: {}", permittedAntPatterns, toString());
 
@@ -109,9 +106,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable();
 
-        if (permitAllCORS) {
-            CorsFilter corsFilter = new CorsFilter();
-            logger.info("Adding CORS filter: {}", corsFilter.toString());
+        if (corsConfig.isCustomCorsFilterEnabled()) {
+            Filter corsFilter = corsConfig.getCustomCorsFilter();
+            logger.info("Adding customized CORS filter: {}", corsFilter.getClass().getName());
             http.addFilterBefore(corsFilter, LogoutFilter.class);
         }
     }
@@ -120,33 +117,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         logger.info("Configuring AuthenticationProvider using: {}", authProvider.getClass());
         auth.authenticationProvider(authProvider);
-    }
-
-    static class CorsFilter extends OncePerRequestFilter {
-
-        private String allowOrigin = "*";
-        private String allowMethods = "POST, GET, OPTIONS";
-        private String allowCredentials = "true";
-        private String allowHeaders = "content-type, x-gwt-module-base, x-gwt-permutation, clientid, longpush, set-cookie";
-
-        @Override
-        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-            response.addHeader("Access-Control-Allow-Origin", allowOrigin);
-            response.setHeader("Access-Control-Allow-Methods", allowMethods);
-            response.setHeader("Access-Control-Allow-Credentials", allowCredentials);
-            response.setHeader("Access-Control-Allow-Headers", allowHeaders);
-            filterChain.doFilter(request, response);
-        }
-
-        @Override
-        public String toString() {
-            return "CorsFilter{" +
-                    "allowOrigin='" + allowOrigin + '\'' +
-                    ", allowMethods='" + allowMethods + '\'' +
-                    ", allowCredentials='" + allowCredentials + '\'' +
-                    ", allowHeaders='" + allowHeaders + '\'' +
-                    '}';
-        }
     }
 }
