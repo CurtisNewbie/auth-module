@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
 public class AuthenticationSuccessHandlerDelegate implements AuthenticationSuccessHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationSuccessHandlerDelegate.class);
-    @DubboReference
+    @DubboReference(lazy = true)
     private RemoteAccessLogService accessLogService;
     @Autowired(required = false)
     private AuthenticationSuccessHandlerExtender extender;

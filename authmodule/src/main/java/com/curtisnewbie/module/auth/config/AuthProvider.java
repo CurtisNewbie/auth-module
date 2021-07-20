@@ -29,7 +29,7 @@ public class AuthProvider implements AuthenticationProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthProvider.class);
 
-    @DubboReference
+    @DubboReference(lazy = true)
     private RemoteUserService remoteUserService;
 
     @Override
