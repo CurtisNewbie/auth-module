@@ -1,9 +1,11 @@
 package com.curtisnewbie.module.auth.config;
 
-import com.curtisnewbie.module.auth.consts.UserIsDisabled;
-import com.curtisnewbie.module.auth.dao.UserEntity;
-import com.curtisnewbie.module.auth.services.api.UserService;
-import com.curtisnewbie.module.auth.util.PasswordUtil;
+import com.curtisnewbie.service.auth.remote.api.RemoteUserService;
+import com.curtisnewbie.service.auth.remote.exception.PasswordIncorrectException;
+import com.curtisnewbie.service.auth.remote.exception.UserDisabledException;
+import com.curtisnewbie.service.auth.remote.exception.UsernameNotFoundException;
+import com.curtisnewbie.service.auth.remote.vo.UserVo;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,11 +15,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Custom authentication provider
@@ -29,11 +29,8 @@ public class AuthProvider implements AuthenticationProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthProvider.class);
 
-    private final UserService userService;
-
-    public AuthProvider(UserService userService) {
-        this.userService = userService;
-    }
+    @DubboReference
+    private RemoteUserService remoteUserService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -41,23 +38,19 @@ public class AuthProvider implements AuthenticationProvider {
             return authentication;
 
         String username = authentication.getName();
-        UserEntity user = userService.loadUserByUsername(username);
-        if (user == null) {
-            logger.info("User '{}' not found", username);
-            throw new UsernameNotFoundException("User '" + username + "' not found");
-        }
-        if (Objects.equals(user.getIsDisabled(), UserIsDisabled.DISABLED.getValue())) {
-            logger.info("User '{}' is disabled", username);
-            throw new DisabledException("User '" + username + "' is disabled");
-        }
-        String password = authentication.getCredentials().toString();
-        boolean isPasswordMatched = PasswordUtil.getValidator()
-                .givenPasswordAndSalt(password, user.getSalt())
-                .compareTo(user.getPassword())
-                .isMatched();
-        if (isPasswordMatched) {
+        UserVo user;
+        try {
+            user = remoteUserService.login(username, authentication.getCredentials().toString());
             logger.info("User '{}' authenticated", username);
             return buildSuccessfulAuthentication(user, authentication);
+        } catch (UserDisabledException e) {
+            logger.info("User '{}' is disabled", username);
+            throw new DisabledException("User '" + username + "' is disabled");
+        } catch (UsernameNotFoundException e) {
+            logger.info("User '{}' not found", username);
+            throw new org.springframework.security.core.userdetails.UsernameNotFoundException("User '" + username + "' not found");
+        } catch (PasswordIncorrectException e) {
+            logger.info("Incorrect password for user '{}'", username);
         }
         throw new BadCredentialsException("Incorrect username or password");
     }
@@ -69,7 +62,7 @@ public class AuthProvider implements AuthenticationProvider {
     }
 
     /** Build successful Authentication */
-    private static UsernamePasswordAuthenticationToken buildSuccessfulAuthentication(UserEntity ue, Authentication au) {
+    private static UsernamePasswordAuthenticationToken buildSuccessfulAuthentication(UserVo ue, Authentication au) {
         return new UsernamePasswordAuthenticationToken(ue,
                 au.getCredentials(),
                 Arrays.asList(new SimpleGrantedAuthority(ue.getRole())));

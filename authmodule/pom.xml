@@ -10,9 +10,9 @@
   </parent>
   <groupId>com.curtisnewbie</groupId>
   <artifactId>authmodule</artifactId>
-  <version>1.0.1</version>
+  <version>micro-1.0.1</version>
   <name>authmodule</name>
-  <description>Simple authentication module</description>
+  <description>Simple authentication module for microservices</description>
 
   <properties>
     <java.version>11</java.version>
@@ -42,12 +42,23 @@
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.curtisnewbie</groupId>
+      <artifactId>auth-service-remote</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.curtisnewbie</groupId>
+      <artifactId>service-module</artifactId>
+      <version>0.0.1</version>
+      <scope>provided</scope>
+    </dependency>
     <!-- https://github.com/CurtisNewbie/comment-generator -->
-<!--    <dependency>-->
-<!--      <groupId>com.curtisnewbie</groupId>-->
-<!--      <artifactId>comment-generator</artifactId>-->
-<!--      <version>1.0-SNAPSHOT</version>-->
-<!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>com.curtisnewbie</groupId>-->
+    <!--      <artifactId>comment-generator</artifactId>-->
+    <!--      <version>1.0-SNAPSHOT</version>-->
+    <!--    </dependency>-->
     <!-- https://github.com/CurtisNewbie/common-module -->
     <dependency>
       <groupId>com.curtisnewbie</groupId>
@@ -56,22 +67,22 @@
     </dependency>
   </dependencies>
   <build>
-<!--    <plugins>-->
-<!--      <plugin>-->
-<!--        <groupId>org.mybatis.generator</groupId>-->
-<!--        <artifactId>mybatis-generator-maven-plugin</artifactId>-->
-<!--        <version>1.4.0</version>-->
-<!--        <dependencies>-->
-<!--          <dependency>-->
-<!--            <groupId>com.curtisnewbie</groupId>-->
-<!--            <artifactId>comment-generator</artifactId>-->
-<!--            <version>1.0-SNAPSHOT</version>-->
-<!--          </dependency>-->
-<!--        </dependencies>-->
-<!--        <configuration>-->
-<!--          <configurationFile>generatorConfig.xml</configurationFile>-->
-<!--        </configuration>-->
-<!--      </plugin>-->
-<!--    </plugins>-->
+    <!--    <plugins>-->
+    <!--      <plugin>-->
+    <!--        <groupId>org.mybatis.generator</groupId>-->
+    <!--        <artifactId>mybatis-generator-maven-plugin</artifactId>-->
+    <!--        <version>1.4.0</version>-->
+    <!--        <dependencies>-->
+    <!--          <dependency>-->
+    <!--            <groupId>com.curtisnewbie</groupId>-->
+    <!--            <artifactId>comment-generator</artifactId>-->
+    <!--            <version>1.0-SNAPSHOT</version>-->
+    <!--          </dependency>-->
+    <!--        </dependencies>-->
+    <!--        <configuration>-->
+    <!--          <configurationFile>generatorConfig.xml</configurationFile>-->
+    <!--        </configuration>-->
+    <!--      </plugin>-->
+    <!--    </plugins>-->
   </build>
 </project>

@@ -1,8 +1,9 @@
 package com.curtisnewbie.module.auth.config;
 
-import com.curtisnewbie.module.auth.dao.AccessLogEntity;
-import com.curtisnewbie.module.auth.dao.UserEntity;
-import com.curtisnewbie.module.auth.services.api.AccessLogService;
+import com.curtisnewbie.service.auth.remote.api.RemoteAccessLogService;
+import com.curtisnewbie.service.auth.remote.vo.AccessLogVo;
+import com.curtisnewbie.service.auth.remote.vo.UserVo;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,13 @@ import java.util.concurrent.CompletableFuture;
 public class AuthenticationSuccessHandlerDelegate implements AuthenticationSuccessHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationSuccessHandlerDelegate.class);
-    @Autowired
-    private AccessLogService accessLogService;
+    @DubboReference
+    private RemoteAccessLogService accessLogService;
     @Autowired(required = false)
     private AuthenticationSuccessHandlerExtender extender;
 
     @PostConstruct
-    void postConstruct(){
+    void postConstruct() {
         if (extender != null) {
             logger.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
         }
@@ -47,20 +48,20 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
     }
 
     private void logAccessInfoAsync(HttpServletRequest request, Authentication auth) {
-        AccessLogEntity accessLogEntity = new AccessLogEntity();
-        accessLogEntity.setIpAddress(request.getRemoteAddr());
-        accessLogEntity.setAccessTime(new Date());
-        if (auth.getPrincipal() != null && auth.getPrincipal() instanceof UserEntity) {
-            UserEntity userEntity = (UserEntity) auth.getPrincipal();
-            accessLogEntity.setUserId(userEntity.getId());
-            accessLogEntity.setUsername(userEntity.getUsername());
+        AccessLogVo accessLog = new AccessLogVo();
+        accessLog.setIpAddress(request.getRemoteAddr());
+        accessLog.setAccessTime(new Date());
+        if (auth.getPrincipal() != null && auth.getPrincipal() instanceof UserVo) {
+            UserVo user = (UserVo) auth.getPrincipal();
+            accessLog.setUserId(user.getId());
+            accessLog.setUsername(user.getUsername());
         }
         CompletableFuture.runAsync(() -> {
             logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
-                    accessLogEntity.getId(),
-                    accessLogEntity.getUsername(),
-                    accessLogEntity.getUserId());
-            accessLogService.save(accessLogEntity);
+                    accessLog.getId(),
+                    accessLog.getUsername(),
+                    accessLog.getUserId());
+            accessLogService.save(accessLog);
         }).handle((r, e) -> {
             if (e != null) {
                 logger.error("Unable to save access log", e);
