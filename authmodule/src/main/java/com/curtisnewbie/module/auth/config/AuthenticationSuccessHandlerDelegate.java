@@ -1,7 +1,7 @@
 package com.curtisnewbie.module.auth.config;
 
 import com.curtisnewbie.service.auth.remote.api.RemoteAccessLogService;
-import com.curtisnewbie.service.auth.remote.vo.AccessLogVo;
+import com.curtisnewbie.service.auth.remote.vo.AccessLogInfoVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
     }
 
     private void logAccessInfoAsync(HttpServletRequest request, Authentication auth) {
-        AccessLogVo accessLog = new AccessLogVo();
+        AccessLogInfoVo accessLog = new AccessLogInfoVo();
         accessLog.setIpAddress(request.getRemoteAddr());
         accessLog.setAccessTime(new Date());
         if (auth.getPrincipal() != null && auth.getPrincipal() instanceof UserVo) {
@@ -58,7 +58,7 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
         }
         CompletableFuture.runAsync(() -> {
             logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
-                    accessLog.getId(),
+                    accessLog.getIpAddress(),
                     accessLog.getUsername(),
                     accessLog.getUserId());
             accessLogService.save(accessLog);
