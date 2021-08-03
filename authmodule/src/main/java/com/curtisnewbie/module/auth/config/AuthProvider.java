@@ -1,5 +1,6 @@
 package com.curtisnewbie.module.auth.config;
 
+import com.curtisnewbie.module.tracing.common.MdcUtil;
 import com.curtisnewbie.service.auth.remote.api.RemoteUserService;
 import com.curtisnewbie.service.auth.remote.exception.PasswordIncorrectException;
 import com.curtisnewbie.service.auth.remote.exception.UserDisabledException;
@@ -40,6 +41,9 @@ public class AuthProvider implements AuthenticationProvider {
         String username = authentication.getName();
         UserVo user;
         try {
+            // for log tracing
+            MdcUtil.setTraceId(username);
+            // attempt to authenticate
             user = remoteUserService.login(username, authentication.getCredentials().toString());
             logger.info("User '{}' authenticated", username);
             return buildSuccessfulAuthentication(user, authentication);
