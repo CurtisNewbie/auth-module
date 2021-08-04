@@ -36,8 +36,6 @@ public class AuthenticationFailureHandlerDelegate implements AuthenticationFailu
             throws IOException, ServletException {
         if (extender != null) {
             extender.onAuthenticationFailure(request, response, exception);
-        } else {
-            defaultHandler(request, response, exception);
         }
     }
 
