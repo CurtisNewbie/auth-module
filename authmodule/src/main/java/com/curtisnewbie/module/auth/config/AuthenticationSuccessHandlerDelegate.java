@@ -1,5 +1,6 @@
 package com.curtisnewbie.module.auth.config;
 
+import com.curtisnewbie.module.tracing.common.TracingRunnableDecorator;
 import com.curtisnewbie.service.auth.remote.api.RemoteAccessLogService;
 import com.curtisnewbie.service.auth.remote.vo.AccessLogInfoVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
@@ -56,13 +57,13 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
             accessLog.setUserId(user.getId());
             accessLog.setUsername(user.getUsername());
         }
-        CompletableFuture.runAsync(() -> {
+        CompletableFuture.runAsync(TracingRunnableDecorator.decorate(() -> {
             logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
                     accessLog.getIpAddress(),
                     accessLog.getUsername(),
                     accessLog.getUserId());
             accessLogService.save(accessLog);
-        }).handle((r, e) -> {
+        })).handle((r, e) -> {
             if (e != null) {
                 logger.error("Unable to save access log", e);
             }
