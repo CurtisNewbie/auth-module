@@ -10,8 +10,10 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
@@ -21,6 +23,9 @@ import static com.curtisnewbie.module.tracing.common.TracingRunnableDecorator.de
  * Advice for saving operate_log
  * <p>
  * This should be used in combination with {@link LogOperation}
+ * </p>
+ * <p>
+ * You can also disable this functionality by setting {@link #ENABLE_OPERATE_LOG_KEY} to false in *.properties file.
  * </p>
  *
  * @author yongjie.zhuang
@@ -33,14 +38,25 @@ public class OperateLogAdvice {
     private static final String ANONYMOUS_NAME = "anonymous";
     private static final int ANONYMOUS_ID = 0;
     private static final int MAX_PARAM_LENGTH = 950;
+    private static final String ENABLE_OPERATE_LOG_KEY = "auth-module.enable-operate-log";
+
+    @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
+    private boolean operateLogEnabled;
 
     @DubboReference
     private RemoteOperateLogService remoteOperateLogService;
 
+    @PostConstruct
+    void onInit() {
+        if (!operateLogEnabled)
+            log.info("Operation log disabled, configure '{}=true' to turn it on", ENABLE_OPERATE_LOG_KEY);
+    }
+
     @Around("@annotation(logOperation)")
     public Object logOperation(ProceedingJoinPoint pjp, LogOperation logOperation) throws Throwable {
         try {
-            doAsyncOperationLog(pjp, logOperation);
+            if (operateLogEnabled)
+                doAsyncOperationLog(pjp, logOperation);
         } catch (Exception e) {
             log.error("Unable to log operation", e);
         }
