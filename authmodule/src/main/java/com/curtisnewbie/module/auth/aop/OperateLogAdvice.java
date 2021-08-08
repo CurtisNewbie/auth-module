@@ -70,7 +70,8 @@ public class OperateLogAdvice {
         CompletableFuture.runAsync(decorate(() -> {
             remoteOperateLogService.saveOperateLogInfo(v);
         })).handle((t, e) -> {
-            log.error("Unable to save operation log", t);
+            if (e != null)
+                log.error("Unable to save operation log", e);
             return t;
         });
     }
@@ -85,16 +86,39 @@ public class OperateLogAdvice {
                     sb.append(",");
                 continue;
             }
-            sb.append(a.toString());
+            // skip the injected object from spring
+            if (a.getClass().getCanonicalName().startsWith("org.springframework"))
+                continue;
+            sb.append(stripOffClassName(a));
             if (i < args.length - 1)
                 sb.append(",");
         }
         // cut it if necessary
         if (sb.length() > MAX_PARAM_LENGTH) {
             sb.setLength(MAX_PARAM_LENGTH);
+            sb.append("...");
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    private String stripOffClassName(Object o) {
+        String ts = o.toString();
+        String clzName = o.getClass().getCanonicalName();
+        int i;
+        // Object#toString() with outer class's name
+        if ((i = ts.indexOf(clzName)) != -1)
+            return o.getClass().getSimpleName() + ts.substring(i + clzName.length());
+
+        // Object#toString() with inner class's name
+        int j;
+        if ((j = ts.lastIndexOf("$")) != -1) {
+            // replace the $ with .
+            String rts = ts.substring(0, j) + "." + ts.substring(j + 1);
+            if ((i = rts.indexOf(clzName)) != -1)
+                return o.getClass().getSimpleName() + rts.substring(i + clzName.length());
+        }
+        return ts;
     }
 
 }
