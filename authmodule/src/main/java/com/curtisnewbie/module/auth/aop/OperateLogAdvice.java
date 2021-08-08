@@ -81,18 +81,17 @@ public class OperateLogAdvice {
         for (int i = 0; i < args.length; i++) {
             Object a = args[i];
             if (a == null) {
-                sb.append("null");
-                if (i < args.length - 1)
-                    sb.append(",");
                 continue;
             }
             // skip the injected object from spring
-            if (a.getClass().getCanonicalName().startsWith("org.springframework"))
+            if (isExcluded(a))
                 continue;
-            sb.append(stripOffClassName(a));
-            if (i < args.length - 1)
+
+            if (i > 0 && sb.length() > 0)
                 sb.append(",");
+            sb.append(stripOffClassName(a));
         }
+
         // cut it if necessary
         if (sb.length() > MAX_PARAM_LENGTH) {
             sb.setLength(MAX_PARAM_LENGTH);
@@ -119,6 +118,10 @@ public class OperateLogAdvice {
                 return o.getClass().getSimpleName() + rts.substring(i + clzName.length());
         }
         return ts;
+    }
+
+    private boolean isExcluded(Object o) {
+        return o.getClass().getCanonicalName().startsWith("org.springframework");
     }
 
 }

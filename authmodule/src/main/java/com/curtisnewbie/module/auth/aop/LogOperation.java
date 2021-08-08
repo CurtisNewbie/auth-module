@@ -10,8 +10,13 @@ import java.lang.annotation.*;
  * Usage example:
  * <pre>
  *    {@code
- *
- *
+ *      @LogOperation(name = "/extension/name", description = "list supported file extensions")
+ *      @GetMapping(path = "/extension/name", produces = MediaType.APPLICATION_JSON_VALUE)
+ *      public Result<List<String>> listSupportedFileExtensionNames() {
+ *          return Result.of(
+ *              fileExtensionService.getNamesOfAllEnabled()
+ *          );
+ *      }
  *    }
  * </pre>
  *
