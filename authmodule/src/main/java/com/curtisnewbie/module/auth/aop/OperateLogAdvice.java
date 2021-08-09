@@ -83,13 +83,18 @@ public class OperateLogAdvice {
         v.setUsername(username);
         v.setUserId(userId);
 
-        CompletableFuture.runAsync(decorate(() -> {
-            remoteOperateLogService.saveOperateLogInfo(v);
-        })).handle((t, e) -> {
-            if (e != null)
-                log.error("Unable to save operation log", e);
-            return t;
-        });
+        try {
+            CompletableFuture.runAsync(decorate(() -> {
+                remoteOperateLogService.saveOperateLogInfo(v);
+            })).handle((t, e) -> {
+                if (e != null)
+                    log.error("Unable to save operation log", e);
+                return t;
+            });
+        } catch (Exception e) {
+            // catch all exception such that the business operations are never interrupted
+            log.error("Unable to save operation log", e);
+        }
     }
 
     private String toParamString(Object[] args) {
