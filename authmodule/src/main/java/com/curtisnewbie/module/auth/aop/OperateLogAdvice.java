@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.curtisnewbie.module.tracing.common.TracingRunnableDecorator.decorate;
 
@@ -39,6 +40,8 @@ public class OperateLogAdvice {
     private static final int ANONYMOUS_ID = 0;
     private static final int MAX_PARAM_LENGTH = 950;
     private static final String ENABLE_OPERATE_LOG_KEY = "auth-module.enable-operate-log";
+
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
     private boolean operateLogEnabled;
@@ -83,18 +86,14 @@ public class OperateLogAdvice {
         v.setUsername(username);
         v.setUserId(userId);
 
-        try {
-            CompletableFuture.runAsync(decorate(() -> {
+        executorService.execute(decorate(() -> {
+            try {
                 remoteOperateLogService.saveOperateLogInfo(v);
-            })).handle((t, e) -> {
-                if (e != null)
-                    log.error("Unable to save operation log", e);
-                return t;
-            });
-        } catch (Exception e) {
-            // catch all exception such that the business operations are never interrupted
-            log.error("Unable to save operation log", e);
-        }
+            } catch (Exception e) {
+                log.error("Unable to save operation log", e);
+            }
+        }));
+
     }
 
     private String toParamString(Object[] args) {

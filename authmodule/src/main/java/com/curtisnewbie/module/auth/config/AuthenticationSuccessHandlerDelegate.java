@@ -1,6 +1,5 @@
 package com.curtisnewbie.module.auth.config;
 
-import com.curtisnewbie.module.tracing.common.TracingRunnableDecorator;
 import com.curtisnewbie.service.auth.remote.api.RemoteAccessLogService;
 import com.curtisnewbie.service.auth.remote.vo.AccessLogInfoVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
@@ -18,7 +17,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static com.curtisnewbie.module.tracing.common.TracingRunnableDecorator.decorate;
 
 /**
  * @author yongjie.zhuang
@@ -31,6 +33,8 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
     private RemoteAccessLogService accessLogService;
     @Autowired(required = false)
     private AuthenticationSuccessHandlerExtender extender;
+
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     @PostConstruct
     void postConstruct() {
@@ -57,18 +61,17 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
             accessLog.setUserId(user.getId());
             accessLog.setUsername(user.getUsername());
         }
-        CompletableFuture.runAsync(TracingRunnableDecorator.decorate(() -> {
-            logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
-                    accessLog.getIpAddress(),
-                    accessLog.getUsername(),
-                    accessLog.getUserId());
-            accessLogService.save(accessLog);
-        })).handle((r, e) -> {
-            if (e != null) {
-                logger.error("Unable to save access log", e);
+        executorService.execute(decorate(() -> {
+            try {
+                logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
+                        accessLog.getIpAddress(),
+                        accessLog.getUsername(),
+                        accessLog.getUserId());
+                accessLogService.save(accessLog);
+            } catch (Exception e) {
+                logger.error("Unable to save access-log", e);
             }
-            return r;
-        });
+        }));
     }
 }
 
