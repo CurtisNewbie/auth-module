@@ -1,37 +1,27 @@
 # authmodule
 
-Simple authentication module for internal use. Only works with HTTPS.
+Module for web security, user authentication, and integration with **auth-service** (https://github.com/CurtisNewbie/auth-service)
 
-## To use it:
+## Modules and Dependencies
 
-1. Install jar to local repository as follows:
+This project depends on the following modules that you must manually install (using `mvn clean install`).
 
-```
-mvn clean install
-```
+- auth-service-remote
+    - description: API layer for using auth-service (via RPC calls)
+    - url: https://github.com/CurtisNewbie/auth-service
+    - branch: main 
 
-2. Import it inside your pom:
+- common-module
+    - description: for common utility classes 
+    - url: https://github.com/CurtisNewbie/common-module
+    - branch: main
 
-```
-<dependency>
-    <groupId>com.curtisnewbie</groupId>
-    <artifactId>authmodule</artifactId>
-    <version>0.0.1</version>
-</dependency>
-```
+- service-module
+    - description: import dependencies for a Dubbo service
+    - url: https://github.com/CurtisNewbie/service-module
+    - branch: main
 
-3. Run DDL script in `/db-scripts/user.sql`
-
-4. Configure following properties for MySql connection:
-
-```
-spring.datasource.url=jdbc:mysql://localhost:3306/yourDb
-spring.datasource.username=yourUsername
-spring.datasource.password=yourPassword
-```
-
-5. Add following annoation on @Configuration annotated class
-
-```
-@ComponentScan(basePackages = "com.curtisnewbie.module")
-```
+- log-tracing-module
+    - desription: for log tracing between web endpoints and service layers
+    - url: https://github.com/CurtisNewbie/log-tracing-module
+    - branch: main
