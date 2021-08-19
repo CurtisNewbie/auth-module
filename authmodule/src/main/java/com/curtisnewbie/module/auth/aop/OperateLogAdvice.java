@@ -2,7 +2,7 @@ package com.curtisnewbie.module.auth.aop;
 
 import com.curtisnewbie.module.auth.util.AuthUtil;
 import com.curtisnewbie.module.messaging.service.MessagingService;
-import com.curtisnewbie.service.auth.messaging.routing.RoutingEnum;
+import com.curtisnewbie.service.auth.messaging.routing.AuthServiceRoutingInfo;
 import com.curtisnewbie.service.auth.remote.exception.InvalidAuthenticationException;
 import com.curtisnewbie.service.auth.remote.vo.OperateLogVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
@@ -10,14 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Advice for saving operate_log
@@ -40,13 +39,9 @@ public class OperateLogAdvice {
     private static final int MAX_PARAM_LENGTH = 950;
     private static final String ENABLE_OPERATE_LOG_KEY = "auth-module.enable-operate-log";
 
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-
     @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
     private boolean operateLogEnabled;
 
-    //    @DubboReference
-//    private RemoteOperateLogService remoteOperateLogService;
     @Autowired
     private MessagingService messagingService;
 
@@ -88,19 +83,10 @@ public class OperateLogAdvice {
         v.setUserId(userId);
 
         try {
-            messagingService.sendJson(v, RoutingEnum.SAVE_OPERATE_LOG_ROUTING.getExchange(),
-                    RoutingEnum.SAVE_OPERATE_LOG_ROUTING.getRoutingKey());
+            messagingService.send(v, AuthServiceRoutingInfo.SAVE_OPERATE_LOG_ROUTING, MessageDeliveryMode.NON_PERSISTENT);
         } catch (Exception e) {
             log.error("Unable to save operation log", e);
         }
-
-//        executorService.execute(decorate(() -> {
-//            try {
-//                remoteOperateLogService.saveOperateLogInfo(v);
-//            } catch (Exception e) {
-//                log.error("Unable to save operation log", e);
-//            }
-//        }));
     }
 
     private String toParamString(Object[] args) {

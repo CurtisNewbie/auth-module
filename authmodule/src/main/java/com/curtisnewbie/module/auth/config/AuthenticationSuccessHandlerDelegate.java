@@ -1,11 +1,12 @@
 package com.curtisnewbie.module.auth.config;
 
 import com.curtisnewbie.module.messaging.service.MessagingService;
-import com.curtisnewbie.service.auth.messaging.routing.RoutingEnum;
+import com.curtisnewbie.service.auth.messaging.routing.AuthServiceRoutingInfo;
 import com.curtisnewbie.service.auth.remote.vo.AccessLogInfoVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -68,8 +69,8 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
                     accessLog.getIpAddress(),
                     accessLog.getUsername(),
                     accessLog.getUserId());
-            messagingService.sendJson(accessLog, RoutingEnum.SAVE_ACCESS_LOG_ROUTING.getExchange(),
-                    RoutingEnum.SAVE_ACCESS_LOG_ROUTING.getRoutingKey());
+            messagingService.send(accessLog, AuthServiceRoutingInfo.SAVE_ACCESS_LOG_ROUTING,
+                    MessageDeliveryMode.NON_PERSISTENT);
         } catch (Exception e) {
             logger.error("Unable to save access-log", e);
         }
