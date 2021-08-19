@@ -1,9 +1,9 @@
 package com.curtisnewbie.module.auth.config;
 
-import com.curtisnewbie.service.auth.remote.api.RemoteAccessLogService;
+import com.curtisnewbie.module.messaging.service.MessagingService;
+import com.curtisnewbie.service.auth.messaging.routing.RoutingEnum;
 import com.curtisnewbie.service.auth.remote.vo.AccessLogInfoVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +20,6 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.curtisnewbie.module.tracing.common.TracingRunnableDecorator.decorate;
-
 /**
  * @author yongjie.zhuang
  */
@@ -29,10 +27,13 @@ import static com.curtisnewbie.module.tracing.common.TracingRunnableDecorator.de
 public class AuthenticationSuccessHandlerDelegate implements AuthenticationSuccessHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationSuccessHandlerDelegate.class);
-    @DubboReference(lazy = true)
-    private RemoteAccessLogService accessLogService;
+    //    @DubboReference(lazy = true)
+//    private RemoteAccessLogService accessLogService;
     @Autowired(required = false)
     private AuthenticationSuccessHandlerExtender extender;
+
+    @Autowired
+    private MessagingService messagingService;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -61,17 +62,29 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
             accessLog.setUserId(user.getId());
             accessLog.setUsername(user.getUsername());
         }
-        executorService.execute(decorate(() -> {
-            try {
-                logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
-                        accessLog.getIpAddress(),
-                        accessLog.getUsername(),
-                        accessLog.getUserId());
-                accessLogService.save(accessLog);
-            } catch (Exception e) {
-                logger.error("Unable to save access-log", e);
-            }
-        }));
+
+        try {
+            logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
+                    accessLog.getIpAddress(),
+                    accessLog.getUsername(),
+                    accessLog.getUserId());
+            messagingService.sendJson(accessLog, RoutingEnum.SAVE_ACCESS_LOG_ROUTING.getExchange(),
+                    RoutingEnum.SAVE_ACCESS_LOG_ROUTING.getRoutingKey());
+        } catch (Exception e) {
+            logger.error("Unable to save access-log", e);
+        }
+
+//        executorService.execute(decorate(() -> {
+//            try {
+//                logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
+//                        accessLog.getIpAddress(),
+//                        accessLog.getUsername(),
+//                        accessLog.getUserId());
+//                accessLogService.save(accessLog);
+//            } catch (Exception e) {
+//                logger.error("Unable to save access-log", e);
+//            }
+//        }));
     }
 }
 

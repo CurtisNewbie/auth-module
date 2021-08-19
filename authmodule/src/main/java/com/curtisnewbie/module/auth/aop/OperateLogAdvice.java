@@ -1,15 +1,16 @@
 package com.curtisnewbie.module.auth.aop;
 
 import com.curtisnewbie.module.auth.util.AuthUtil;
-import com.curtisnewbie.service.auth.remote.api.RemoteOperateLogService;
+import com.curtisnewbie.module.messaging.service.MessagingService;
+import com.curtisnewbie.service.auth.messaging.routing.RoutingEnum;
 import com.curtisnewbie.service.auth.remote.exception.InvalidAuthenticationException;
 import com.curtisnewbie.service.auth.remote.vo.OperateLogVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,6 @@ import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import static com.curtisnewbie.module.tracing.common.TracingRunnableDecorator.decorate;
 
 /**
  * Advice for saving operate_log
@@ -46,8 +45,10 @@ public class OperateLogAdvice {
     @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
     private boolean operateLogEnabled;
 
-    @DubboReference
-    private RemoteOperateLogService remoteOperateLogService;
+    //    @DubboReference
+//    private RemoteOperateLogService remoteOperateLogService;
+    @Autowired
+    private MessagingService messagingService;
 
     @PostConstruct
     void onInit() {
@@ -86,14 +87,20 @@ public class OperateLogAdvice {
         v.setUsername(username);
         v.setUserId(userId);
 
-        executorService.execute(decorate(() -> {
-            try {
-                remoteOperateLogService.saveOperateLogInfo(v);
-            } catch (Exception e) {
-                log.error("Unable to save operation log", e);
-            }
-        }));
+        try {
+            messagingService.sendJson(v, RoutingEnum.SAVE_OPERATE_LOG_ROUTING.getExchange(),
+                    RoutingEnum.SAVE_OPERATE_LOG_ROUTING.getRoutingKey());
+        } catch (Exception e) {
+            log.error("Unable to save operation log", e);
+        }
 
+//        executorService.execute(decorate(() -> {
+//            try {
+//                remoteOperateLogService.saveOperateLogInfo(v);
+//            } catch (Exception e) {
+//                log.error("Unable to save operation log", e);
+//            }
+//        }));
     }
 
     private String toParamString(Object[] args) {

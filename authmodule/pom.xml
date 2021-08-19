@@ -22,46 +22,57 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
-      <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
+
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>auth-service-remote</artifactId>
       <version>0.0.1</version>
     </dependency>
+
     <dependency>
       <groupId>com.curtisnewbie</groupId>
-      <artifactId>service-module</artifactId>
-      <version>0.0.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- https://github.com/CurtisNewbie/comment-generator -->
-    <!--    <dependency>-->
-    <!--      <groupId>com.curtisnewbie</groupId>-->
-    <!--      <artifactId>comment-generator</artifactId>-->
-    <!--      <version>1.0-SNAPSHOT</version>-->
-    <!--    </dependency>-->
-    <!-- https://github.com/CurtisNewbie/common-module -->
-    <dependency>
-      <groupId>com.curtisnewbie</groupId>
-      <artifactId>common-module</artifactId>
+      <artifactId>auth-service-messaging</artifactId>
       <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.curtisnewbie</groupId>
-      <artifactId>log-tracing-module</artifactId>
-      <version>1.0.0</version>
+      <artifactId>service-module</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>com.curtisnewbie</groupId>
+      <artifactId>common-module</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.curtisnewbie</groupId>
+      <artifactId>log-tracing-module</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.curtisnewbie</groupId>
+      <artifactId>messaging-module</artifactId>
+    </dependency>
+
+    <!-- https://github.com/CurtisNewbie/comment-generator -->
+    <!--    <dependency>-->
+    <!--      <groupId>com.curtisnewbie</groupId>-->
+    <!--      <artifactId>comment-generator</artifactId>-->
+    <!--    </dependency>-->
+    <!-- https://github.com/CurtisNewbie/common-module -->
   </dependencies>
   <build>
     <plugins>
@@ -94,4 +105,16 @@
       </plugin>
     </plugins>
   </build>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.curtisnewbie</groupId>
+        <artifactId>curtisnewbie-bom</artifactId>
+        <version>micro-0.0.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
