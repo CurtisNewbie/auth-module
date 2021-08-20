@@ -86,7 +86,8 @@ public class OperateLogAdvice {
         try {
             messagingService.send(MessagingParam.builder()
                     .payload(v)
-                    .routingInfo(AuthServiceRoutingInfo.SAVE_OPERATE_LOG_ROUTING)
+                    .exchange(AuthServiceRoutingInfo.SAVE_OPERATE_LOG_ROUTING.getExchange())
+                    .routingKey(AuthServiceRoutingInfo.SAVE_OPERATE_LOG_ROUTING.getRoutingKey())
                     .deliveryMode(MessageDeliveryMode.NON_PERSISTENT)
                     .build());
         } catch (Exception e) {

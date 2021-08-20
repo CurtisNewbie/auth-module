@@ -2,6 +2,7 @@ package com.curtisnewbie.module.auth.config;
 
 import com.curtisnewbie.module.messaging.service.MessagingParam;
 import com.curtisnewbie.module.messaging.service.MessagingService;
+import com.curtisnewbie.module.messaging.service.NamespaceCorrelationData;
 import com.curtisnewbie.service.auth.messaging.routing.AuthServiceRoutingInfo;
 import com.curtisnewbie.service.auth.remote.vo.AccessLogInfoVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
@@ -72,8 +73,10 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
 
             messagingService.send(MessagingParam.builder()
                     .payload(accessLog)
-                    .routingInfo(AuthServiceRoutingInfo.SAVE_ACCESS_LOG_ROUTING)
+                    .exchange(AuthServiceRoutingInfo.SAVE_ACCESS_LOG_ROUTING.getExchange())
+                    .routingKey(AuthServiceRoutingInfo.SAVE_ACCESS_LOG_ROUTING.getRoutingKey())
                     .deliveryMode(MessageDeliveryMode.NON_PERSISTENT)
+                    .correlationData(new NamespaceCorrelationData("access-log", "123:345:456"))
                     .build());
         } catch (Exception e) {
             logger.error("Unable to save access-log", e);
