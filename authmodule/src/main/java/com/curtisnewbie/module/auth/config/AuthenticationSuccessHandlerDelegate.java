@@ -1,5 +1,6 @@
 package com.curtisnewbie.module.auth.config;
 
+import com.curtisnewbie.module.messaging.service.MessagingParam;
 import com.curtisnewbie.module.messaging.service.MessagingService;
 import com.curtisnewbie.service.auth.messaging.routing.AuthServiceRoutingInfo;
 import com.curtisnewbie.service.auth.remote.vo.AccessLogInfoVo;
@@ -28,8 +29,7 @@ import java.util.concurrent.Executors;
 public class AuthenticationSuccessHandlerDelegate implements AuthenticationSuccessHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationSuccessHandlerDelegate.class);
-    //    @DubboReference(lazy = true)
-//    private RemoteAccessLogService accessLogService;
+
     @Autowired(required = false)
     private AuthenticationSuccessHandlerExtender extender;
 
@@ -69,23 +69,15 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
                     accessLog.getIpAddress(),
                     accessLog.getUsername(),
                     accessLog.getUserId());
-            messagingService.send(accessLog, AuthServiceRoutingInfo.SAVE_ACCESS_LOG_ROUTING,
-                    MessageDeliveryMode.NON_PERSISTENT);
+
+            messagingService.send(MessagingParam.builder()
+                    .payload(accessLog)
+                    .routingInfo(AuthServiceRoutingInfo.SAVE_ACCESS_LOG_ROUTING)
+                    .deliveryMode(MessageDeliveryMode.NON_PERSISTENT)
+                    .build());
         } catch (Exception e) {
             logger.error("Unable to save access-log", e);
         }
-
-//        executorService.execute(decorate(() -> {
-//            try {
-//                logger.info("Logging sign-in info, ip: {}, username: {}, userId: {}",
-//                        accessLog.getIpAddress(),
-//                        accessLog.getUsername(),
-//                        accessLog.getUserId());
-//                accessLogService.save(accessLog);
-//            } catch (Exception e) {
-//                logger.error("Unable to save access-log", e);
-//            }
-//        }));
     }
 }
 

@@ -1,6 +1,7 @@
 package com.curtisnewbie.module.auth.aop;
 
 import com.curtisnewbie.module.auth.util.AuthUtil;
+import com.curtisnewbie.module.messaging.service.MessagingParam;
 import com.curtisnewbie.module.messaging.service.MessagingService;
 import com.curtisnewbie.service.auth.messaging.routing.AuthServiceRoutingInfo;
 import com.curtisnewbie.service.auth.remote.exception.InvalidAuthenticationException;
@@ -83,7 +84,11 @@ public class OperateLogAdvice {
         v.setUserId(userId);
 
         try {
-            messagingService.send(v, AuthServiceRoutingInfo.SAVE_OPERATE_LOG_ROUTING, MessageDeliveryMode.NON_PERSISTENT);
+            messagingService.send(MessagingParam.builder()
+                    .payload(v)
+                    .routingInfo(AuthServiceRoutingInfo.SAVE_OPERATE_LOG_ROUTING)
+                    .deliveryMode(MessageDeliveryMode.NON_PERSISTENT)
+                    .build());
         } catch (Exception e) {
             log.error("Unable to save operation log", e);
         }
