@@ -11,6 +11,11 @@ This project depends on the following modules that you must manually install (us
     - url: https://github.com/CurtisNewbie/auth-service
     - branch: main 
 
+- auth-service-messaging
+    - description: routing information for auth-service's messaging/MQ functionalities
+    - url: https://github.com/CurtisNewbie/auth-service
+    - branch: main 
+
 - common-module
     - description: for common utility classes 
     - url: https://github.com/CurtisNewbie/common-module
@@ -22,6 +27,11 @@ This project depends on the following modules that you must manually install (us
     - branch: main
 
 - log-tracing-module
-    - desription: for log tracing between web endpoints and service layers
+    - description: for log tracing between web endpoints and service layers
     - url: https://github.com/CurtisNewbie/log-tracing-module
+    - branch: main
+
+- messaging-module
+    - description: for RabbitMQ-based messaging 
+    - url: https://github.com/CurtisNewbie/messaging-module
     - branch: main
