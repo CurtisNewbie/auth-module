@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.servlet.Filter;
 import java.util.Arrays;
@@ -81,11 +82,18 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         // setup logoutUrl and logout success handler (delegate)
         http.logout()
                 .permitAll()
+                .clearAuthentication(true)
+                .invalidateHttpSession(true)
                 .logoutSuccessHandler(logoutSuccessHandlerDelegate);
         if (securityConfigHolder.specifiedLogoutUrl()) {
             http.logout().logoutUrl(securityConfigHolder.getLogoutUrl());
             logger.info("Setup logout url: {}", securityConfigHolder.getLogoutUrl());
         }
+
+        // this requires https, and will redirect if necessary
+//        http.requiresChannel(channel -> channel
+//                .anyRequest().requiresSecure()
+//        );
 
         // todo enable csrf
         http.cors()
@@ -93,10 +101,11 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable();
 
-        // todo change to spring's cors configuration
+        // cors configuration
         if (corsConfig.isCustomCorsFilterEnabled()) {
             Filter corsFilter = corsConfig.getCustomCorsFilter();
-            logger.info("Adding customized CORS filter: {}", corsFilter.getClass().getName());
+            logger.info("Adding customized CORS filter: {}, you may consider using {} instead", corsFilter.getClass().getName(),
+                    CorsConfigurationSource.class.getName());
             http.addFilterBefore(corsFilter, LogoutFilter.class);
         }
     }
