@@ -20,7 +20,7 @@ import javax.annotation.PostConstruct;
  * This is very useful for debugging, where you get to see the arguments, etc.
  * </p>
  * <p>
- * It's by default turned off, but you can turn it on by setting property 'controller-console-logging=true'
+ * It's by default turned off, but you can turn it on by setting property 'auth-module.enable-controller-console-log'
  * </p>
  *
  * @author yongjie.zhuang
@@ -30,7 +30,7 @@ import javax.annotation.PostConstruct;
 public class ControllerConsoleLogAdvice {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerConsoleLogAdvice.class);
-    private static final String ENABLE_CONTROLLER_CONSOLE_LOG_KEY = "controller-console-logging";
+    private static final String ENABLE_CONTROLLER_CONSOLE_LOG_KEY = "auth-module.enable-controller-console-log";
 
     @Value("${" + ENABLE_CONTROLLER_CONSOLE_LOG_KEY + ":false}")
     private boolean controllerConsoleLogEnabled;
