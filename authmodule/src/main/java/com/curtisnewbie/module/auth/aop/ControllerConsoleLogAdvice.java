@@ -4,6 +4,7 @@ import com.curtisnewbie.common.vo.Result;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,10 +15,12 @@ import org.springframework.util.StopWatch;
 import javax.annotation.PostConstruct;
 
 /**
- * Advice that log the controller's method execution, controllers' name must be in format of '*Controller', e.g.,
- * 'UserController'.
+ * Advice that log the controller's method execution
  * <p>
- * Can be turned off using {@link #ENABLE_CONTROLLER_CONSOLE_LOG_KEY}
+ * This is very useful for debugging, where you get to see the arguments, etc.
+ * </p>
+ * <p>
+ * It's by default turned off, but you can turn it on by setting property 'controller-console-logging=true'
  * </p>
  *
  * @author yongjie.zhuang
@@ -29,7 +32,7 @@ public class ControllerConsoleLogAdvice {
     private static final Logger logger = LoggerFactory.getLogger(ControllerConsoleLogAdvice.class);
     private static final String ENABLE_CONTROLLER_CONSOLE_LOG_KEY = "controller-console-logging";
 
-    @Value("${" + ENABLE_CONTROLLER_CONSOLE_LOG_KEY + ":true}")
+    @Value("${" + ENABLE_CONTROLLER_CONSOLE_LOG_KEY + ":false}")
     private boolean controllerConsoleLogEnabled;
 
     @PostConstruct
@@ -39,8 +42,12 @@ public class ControllerConsoleLogAdvice {
                     ENABLE_CONTROLLER_CONSOLE_LOG_KEY);
     }
 
-    @Around("execution(* *..*Controller.*(..))")
-    public Object printExecution(ProceedingJoinPoint pjp) throws Throwable {
+    @Pointcut("within(@org.springframework.stereotype.Controller *) || within(@org.springframework.web.bind.annotation.RestController *)")
+    public void controllerPointcut() {
+    }
+
+    @Around("controllerPointcut() && execution(* *(..))")
+    public Object methodCall(ProceedingJoinPoint pjp) throws Throwable {
         if (!controllerConsoleLogEnabled)
             return pjp.proceed();
 
