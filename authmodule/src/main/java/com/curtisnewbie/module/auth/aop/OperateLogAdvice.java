@@ -38,7 +38,7 @@ public class OperateLogAdvice {
     private static final String ANONYMOUS_NAME = "anonymous";
     private static final int ANONYMOUS_ID = 0;
     private static final int MAX_PARAM_LENGTH = 950;
-    private static final String ENABLE_OPERATE_LOG_KEY = "auth-module.enable-operate-log";
+    private static final String ENABLE_OPERATE_LOG_KEY = "authmodule.enable-operate-log";
 
     @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
     private boolean operateLogEnabled;
