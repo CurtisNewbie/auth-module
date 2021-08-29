@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
-
 /**
  * <p>
  * Security-related configuration
@@ -29,10 +27,12 @@ import javax.annotation.PostConstruct;
 public class SecurityConfigHolder {
 
     private static final String EMPTY_STRING = "";
-    private static final String VALUE_PERMITTED_ANT_PATTERNS = "authmodule.permitted-ant-patterns";
-    private static final String VALUE_LOGIN_PROCESSING_URL = "authmodule.login-processing-url";
-    private static final String VALUE_CUSTOM_LOGIN_PAGE = "authmodule.custom-login-page";
-    private static final String VALUE_LOGOUT_URL = "authmodule.logout-url";
+    public static final String VALUE_PERMITTED_ANT_PATTERNS = "authmodule.permitted-ant-patterns";
+    public static final String VALUE_LOGIN_PROCESSING_URL = "authmodule.login-processing-url";
+    public static final String VALUE_CUSTOM_LOGIN_PAGE = "authmodule.custom-login-page";
+    public static final String VALUE_LOGOUT_URL = "authmodule.logout-url";
+    public static final String ENABLE_OPERATE_LOG_KEY = "authmodule.enable-operate-log";
+    public static final String ENABLE_ACCESS_LOG_KEY = "authmodule.enable-access-log";
 
     @Value("${" + VALUE_PERMITTED_ANT_PATTERNS + ":" + EMPTY_STRING + "}") // default to "" empty string
     private String[] permittedAntPatterns;
@@ -42,6 +42,10 @@ public class SecurityConfigHolder {
     private String customLoginPage;
     @Value("${" + VALUE_LOGOUT_URL + ":" + EMPTY_STRING + "}")
     private String logoutUrl;
+    @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
+    private boolean operateLogEnabled;
+    @Value("${" + ENABLE_ACCESS_LOG_KEY + ":true}")
+    private boolean enableAccessLog;
 
     /**
      * Check if a custom login page is specified
@@ -70,4 +74,13 @@ public class SecurityConfigHolder {
     public boolean specifiedLogoutUrl() {
         return !logoutUrl.equals(EMPTY_STRING);
     }
+
+    public boolean isOperateLogEnabled() {
+        return operateLogEnabled;
+    }
+
+    public boolean isAccessLogEnabled() {
+        return enableAccessLog;
+    }
+
 }

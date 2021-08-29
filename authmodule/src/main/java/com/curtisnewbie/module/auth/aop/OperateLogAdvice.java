@@ -1,5 +1,6 @@
 package com.curtisnewbie.module.auth.aop;
 
+import com.curtisnewbie.module.auth.config.SecurityConfigHolder;
 import com.curtisnewbie.module.auth.util.AuthUtil;
 import com.curtisnewbie.module.messaging.service.MessagingParam;
 import com.curtisnewbie.module.messaging.service.MessagingService;
@@ -13,11 +14,12 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
+
+import static com.curtisnewbie.module.auth.config.SecurityConfigHolder.ENABLE_OPERATE_LOG_KEY;
 
 /**
  * Advice for saving operate_log
@@ -25,7 +27,8 @@ import java.util.Date;
  * This should be used in combination with {@link LogOperation}
  * </p>
  * <p>
- * You can also disable this functionality by setting {@link #ENABLE_OPERATE_LOG_KEY} to false in *.properties file.
+ * You can also disable this functionality by setting {@code authmodule.enable-operate-log} to false in *.properties
+ * file.
  * </p>
  *
  * @author yongjie.zhuang
@@ -38,24 +41,23 @@ public class OperateLogAdvice {
     private static final String ANONYMOUS_NAME = "anonymous";
     private static final int ANONYMOUS_ID = 0;
     private static final int MAX_PARAM_LENGTH = 950;
-    private static final String ENABLE_OPERATE_LOG_KEY = "authmodule.enable-operate-log";
 
-    @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
-    private boolean operateLogEnabled;
+    @Autowired
+    private SecurityConfigHolder securityConfigHolder;
 
     @Autowired
     private MessagingService messagingService;
 
     @PostConstruct
     void onInit() {
-        if (!operateLogEnabled)
+        if (!securityConfigHolder.isOperateLogEnabled())
             log.info("Operation log disabled, configure '{}=true' to turn it on", ENABLE_OPERATE_LOG_KEY);
     }
 
     @Around("@annotation(logOperation)")
     public Object logOperation(ProceedingJoinPoint pjp, LogOperation logOperation) throws Throwable {
         try {
-            if (operateLogEnabled)
+            if (securityConfigHolder.isOperateLogEnabled())
                 doAsyncOperationLog(pjp, logOperation);
         } catch (Exception e) {
             log.error("Unable to log operation", e);

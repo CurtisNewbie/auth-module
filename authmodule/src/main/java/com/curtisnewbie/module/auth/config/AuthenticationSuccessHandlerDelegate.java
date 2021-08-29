@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -23,6 +22,8 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.curtisnewbie.module.auth.config.SecurityConfigHolder.ENABLE_ACCESS_LOG_KEY;
+
 /**
  * @author yongjie.zhuang
  */
@@ -30,16 +31,15 @@ import java.util.concurrent.Executors;
 public class AuthenticationSuccessHandlerDelegate implements AuthenticationSuccessHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationSuccessHandlerDelegate.class);
-    private static final String ENABLE_ACCESS_LOG_KEY = "auth-module.enable-access-log";
-
-    @Value("${" + ENABLE_ACCESS_LOG_KEY + ":true}")
-    private boolean enableAccessLog;
 
     @Autowired(required = false)
     private AuthenticationSuccessHandlerExtender extender;
 
     @Autowired
     private MessagingService messagingService;
+
+    @Autowired
+    private SecurityConfigHolder securityConfigHolder;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -48,14 +48,14 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
         if (extender != null) {
             logger.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
         }
-        if (!enableAccessLog)
+        if (!securityConfigHolder.isAccessLogEnabled())
             logger.info("Access log disabled, configure '{}=true' to turn it on", ENABLE_ACCESS_LOG_KEY);
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException, ServletException {
-        if (enableAccessLog)
+        if (securityConfigHolder.isAccessLogEnabled())
             logAccessInfoAsync(httpServletRequest, authentication);
         if (extender != null) {
             extender.onAuthenticationSuccess(httpServletRequest, httpServletResponse, authentication);
