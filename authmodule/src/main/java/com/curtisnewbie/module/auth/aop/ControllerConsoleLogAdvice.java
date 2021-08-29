@@ -30,7 +30,7 @@ import javax.annotation.PostConstruct;
 public class ControllerConsoleLogAdvice {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerConsoleLogAdvice.class);
-    private static final String ENABLE_CONTROLLER_CONSOLE_LOG_KEY = "auth-module.enable-controller-console-log";
+    private static final String ENABLE_CONTROLLER_CONSOLE_LOG_KEY = "authmodule.enable-controller-console-log";
 
     @Value("${" + ENABLE_CONTROLLER_CONSOLE_LOG_KEY + ":false}")
     private boolean controllerConsoleLogEnabled;
