@@ -20,8 +20,6 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static com.curtisnewbie.common.util.EnumUtils.parse;
-
 /**
  * Custom authentication provider
  *
@@ -53,7 +51,7 @@ public class AuthProvider implements AuthenticationProvider {
             logger.info("User '{}' authenticated", username);
 
             if (moduleConfig.isAdminLoginOnly()
-                    && !Objects.equals(UserRole.ADMIN, parse(user.getRole(), UserRole.class))) {
+                    && !Objects.equals(UserRole.ADMIN.getValue(), user.getRole())) {
                 logger.info("Only allow admin to login, reject authentication");
                 throw new InsufficientAuthenticationException("Only admin can login");
             }
