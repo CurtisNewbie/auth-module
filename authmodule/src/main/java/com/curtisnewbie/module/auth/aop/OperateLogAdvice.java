@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Date;
 
-import static com.curtisnewbie.module.auth.config.ModuleConfig.ENABLE_OPERATE_LOG_KEY;
+import static com.curtisnewbie.module.auth.config.ModuleConfig.PROP_NAME_ENABLE_OPERATE_LOG;
 
 /**
  * Advice for saving operate_log
@@ -51,7 +51,7 @@ public class OperateLogAdvice {
     @PostConstruct
     void onInit() {
         if (!moduleConfig.isOperateLogEnabled())
-            log.info("Operation log disabled, configure '{}=true' to turn it on", ENABLE_OPERATE_LOG_KEY);
+            log.info("Operation log disabled, configure '{}=true' to turn it on", PROP_NAME_ENABLE_OPERATE_LOG);
     }
 
     @Around("@annotation(logOperation)")

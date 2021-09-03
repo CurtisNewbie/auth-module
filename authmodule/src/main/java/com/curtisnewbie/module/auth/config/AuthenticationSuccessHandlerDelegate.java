@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.curtisnewbie.module.auth.config.ModuleConfig.ENABLE_ACCESS_LOG_KEY;
+import static com.curtisnewbie.module.auth.config.ModuleConfig.PROP_NAME_ENABLE_ACCESS_LOG;
 
 /**
  * @author yongjie.zhuang
@@ -49,7 +49,7 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
             logger.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
         }
         if (!moduleConfig.isAccessLoginEnabled())
-            logger.info("Access log disabled, configure '{}=true' to turn it on", ENABLE_ACCESS_LOG_KEY);
+            logger.info("Access log disabled, configure '{}=true' to turn it on", PROP_NAME_ENABLE_ACCESS_LOG);
     }
 
     @Override

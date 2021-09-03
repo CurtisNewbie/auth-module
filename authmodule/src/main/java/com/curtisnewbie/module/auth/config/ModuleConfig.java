@@ -27,27 +27,30 @@ import org.springframework.context.annotation.Configuration;
 public class ModuleConfig {
 
     private static final String EMPTY_STRING = "";
-    public static final String VALUE_PERMITTED_ANT_PATTERNS = "authmodule.permitted-ant-patterns";
-    public static final String VALUE_LOGIN_PROCESSING_URL = "authmodule.login-processing-url";
-    public static final String VALUE_CUSTOM_LOGIN_PAGE = "authmodule.custom-login-page";
-    public static final String VALUE_LOGOUT_URL = "authmodule.logout-url";
-    public static final String ENABLE_OPERATE_LOG_KEY = "authmodule.enable-operate-log";
-    public static final String ENABLE_ACCESS_LOG_KEY = "authmodule.enable-access-log";
-    public static final String ONLY_ADMIN_LOGIN_KEY = "authmodule.permit-admin-login-only";
+    public static final String PROP_NAME_PERMITTED_ANT_PATTERNS = "authmodule.permitted-ant-patterns";
+    public static final String PROP_NAME_LOGIN_PROCESSING_URL = "authmodule.login-processing-url";
+    public static final String PROP_NAME_CUSTOM_LOGIN_PAGE = "authmodule.custom-login-page";
+    public static final String PROP_NAME_LOGOUT_URL = "authmodule.logout-url";
+    public static final String PROP_NAME_ENABLE_OPERATE_LOG = "authmodule.enable-operate-log";
+    public static final String PROP_NAME_ENABLE_ACCESS_LOG = "authmodule.enable-access-log";
+    public static final String PROP_NAME_ONLY_ADMIN_LOGIN = "authmodule.permit-admin-login-only";
+    public static final String PROP_NAME_ENABLE_CONTROLLER_CONSOLE_LOG = "authmodule.enable-controller-console-log";
 
-    @Value("${" + VALUE_PERMITTED_ANT_PATTERNS + ":" + EMPTY_STRING + "}") // default to "" empty string
+    @Value("${" + PROP_NAME_ENABLE_CONTROLLER_CONSOLE_LOG + ":false}")
+    private boolean controllerConsoleLogEnabled;
+    @Value("${" + PROP_NAME_PERMITTED_ANT_PATTERNS + ":" + EMPTY_STRING + "}") // default to "" empty string
     private String[] permittedAntPatterns;
-    @Value("${" + VALUE_LOGIN_PROCESSING_URL + ":" + EMPTY_STRING + "}")
+    @Value("${" + PROP_NAME_LOGIN_PROCESSING_URL + ":" + EMPTY_STRING + "}")
     private String loginProcessingUrl;
-    @Value("${" + VALUE_CUSTOM_LOGIN_PAGE + ":" + EMPTY_STRING + "}")
+    @Value("${" + PROP_NAME_CUSTOM_LOGIN_PAGE + ":" + EMPTY_STRING + "}")
     private String customLoginPage;
-    @Value("${" + VALUE_LOGOUT_URL + ":" + EMPTY_STRING + "}")
+    @Value("${" + PROP_NAME_LOGOUT_URL + ":" + EMPTY_STRING + "}")
     private String logoutUrl;
-    @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
+    @Value("${" + PROP_NAME_ENABLE_OPERATE_LOG + ":true}")
     private boolean operateLogEnabled;
-    @Value("${" + ENABLE_ACCESS_LOG_KEY + ":true}")
+    @Value("${" + PROP_NAME_ENABLE_ACCESS_LOG + ":true}")
     private boolean accessLoginEnabled;
-    @Value("${" + ONLY_ADMIN_LOGIN_KEY + ": false}")
+    @Value("${" + PROP_NAME_ONLY_ADMIN_LOGIN + ": false}")
     private boolean adminLoginOnly;
 
     /**

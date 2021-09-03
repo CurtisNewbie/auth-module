@@ -1,18 +1,21 @@
 package com.curtisnewbie.module.auth.aop;
 
 import com.curtisnewbie.common.vo.Result;
+import com.curtisnewbie.module.auth.config.ModuleConfig;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
 import javax.annotation.PostConstruct;
+
+import static com.curtisnewbie.module.auth.config.ModuleConfig.PROP_NAME_ENABLE_CONTROLLER_CONSOLE_LOG;
 
 /**
  * Advice that log the controller's method execution
@@ -30,16 +33,15 @@ import javax.annotation.PostConstruct;
 public class ControllerConsoleLogAdvice {
 
     private static final Logger logger = LoggerFactory.getLogger(ControllerConsoleLogAdvice.class);
-    private static final String ENABLE_CONTROLLER_CONSOLE_LOG_KEY = "authmodule.enable-controller-console-log";
 
-    @Value("${" + ENABLE_CONTROLLER_CONSOLE_LOG_KEY + ":false}")
-    private boolean controllerConsoleLogEnabled;
+    @Autowired
+    private ModuleConfig moduleConfig;
 
     @PostConstruct
     void onInit() {
-        if (!controllerConsoleLogEnabled)
+        if (!moduleConfig.isControllerConsoleLogEnabled())
             logger.info("Controller logging on console is disabled, enable it by setting '{}=true'",
-                    ENABLE_CONTROLLER_CONSOLE_LOG_KEY);
+                    PROP_NAME_ENABLE_CONTROLLER_CONSOLE_LOG);
     }
 
     @Pointcut("within(@org.springframework.stereotype.Controller *) || within(@org.springframework.web.bind.annotation.RestController *)")
@@ -48,7 +50,7 @@ public class ControllerConsoleLogAdvice {
 
     @Around("controllerPointcut() && execution(* *(..))")
     public Object methodCall(ProceedingJoinPoint pjp) throws Throwable {
-        if (!controllerConsoleLogEnabled)
+        if (!moduleConfig.isControllerConsoleLogEnabled())
             return pjp.proceed();
 
         StopWatch sw = new StopWatch();

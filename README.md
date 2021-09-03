@@ -13,6 +13,7 @@ string | authmodule.logout-url | logout url | /logout
 boolean | authmodule.enable-operate-log | enable logging of user operation, this logs any controller methods annotated with @OperationLog, this is saved in database asynchronously | true 
 boolean | authmodule.enable-access-log | enable logging of user access, this logs user's login information, this is saved in database asynchronously | true
 boolean | authmodule.permit-admin-login-only | only allow admin to login | false
+boolean | authmodule.enable-controller-console-log | enable logging of controllers' methods, will print out information on console, such as endpoints method parameters, it's useful for debugging | false
 
 ## Modules and Dependencies
 
