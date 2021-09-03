@@ -21,10 +21,10 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author yongjie.zhuang
  */
-@Configuration
 @Data
+@Configuration
 @Slf4j
-public class SecurityConfigHolder {
+public class ModuleConfig {
 
     private static final String EMPTY_STRING = "";
     public static final String VALUE_PERMITTED_ANT_PATTERNS = "authmodule.permitted-ant-patterns";
@@ -33,6 +33,7 @@ public class SecurityConfigHolder {
     public static final String VALUE_LOGOUT_URL = "authmodule.logout-url";
     public static final String ENABLE_OPERATE_LOG_KEY = "authmodule.enable-operate-log";
     public static final String ENABLE_ACCESS_LOG_KEY = "authmodule.enable-access-log";
+    public static final String ONLY_ADMIN_LOGIN_KEY = "authmodule.permit-admin-login-only";
 
     @Value("${" + VALUE_PERMITTED_ANT_PATTERNS + ":" + EMPTY_STRING + "}") // default to "" empty string
     private String[] permittedAntPatterns;
@@ -45,7 +46,9 @@ public class SecurityConfigHolder {
     @Value("${" + ENABLE_OPERATE_LOG_KEY + ":true}")
     private boolean operateLogEnabled;
     @Value("${" + ENABLE_ACCESS_LOG_KEY + ":true}")
-    private boolean enableAccessLog;
+    private boolean accessLoginEnabled;
+    @Value("${" + ONLY_ADMIN_LOGIN_KEY + ": false}")
+    private boolean adminLoginOnly;
 
     /**
      * Check if a custom login page is specified
@@ -74,13 +77,4 @@ public class SecurityConfigHolder {
     public boolean specifiedLogoutUrl() {
         return !logoutUrl.equals(EMPTY_STRING);
     }
-
-    public boolean isOperateLogEnabled() {
-        return operateLogEnabled;
-    }
-
-    public boolean isAccessLogEnabled() {
-        return enableAccessLog;
-    }
-
 }

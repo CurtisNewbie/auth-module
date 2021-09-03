@@ -2,6 +2,7 @@ package com.curtisnewbie.module.auth.config;
 
 import com.curtisnewbie.module.tracing.common.MdcUtil;
 import com.curtisnewbie.service.auth.remote.api.RemoteUserService;
+import com.curtisnewbie.service.auth.remote.consts.UserRole;
 import com.curtisnewbie.service.auth.remote.exception.PasswordIncorrectException;
 import com.curtisnewbie.service.auth.remote.exception.UserDisabledException;
 import com.curtisnewbie.service.auth.remote.exception.UsernameNotFoundException;
@@ -9,16 +10,17 @@ import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Objects;
+
+import static com.curtisnewbie.common.util.EnumUtils.parse;
 
 /**
  * Custom authentication provider
@@ -33,6 +35,9 @@ public class AuthProvider implements AuthenticationProvider {
     @DubboReference(lazy = true)
     private RemoteUserService remoteUserService;
 
+    @Autowired
+    private ModuleConfig moduleConfig;
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (authentication.isAuthenticated())
@@ -46,6 +51,13 @@ public class AuthProvider implements AuthenticationProvider {
             // attempt to authenticate
             user = remoteUserService.login(username, authentication.getCredentials().toString());
             logger.info("User '{}' authenticated", username);
+
+            if (moduleConfig.isAdminLoginOnly()
+                    && !Objects.equals(UserRole.ADMIN, parse(user.getRole(), UserRole.class))) {
+                logger.info("Only allow admin to login, reject authentication");
+                throw new InsufficientAuthenticationException("Only admin can login");
+            }
+
             return buildSuccessfulAuthentication(user, authentication);
         } catch (UserDisabledException e) {
             logger.info("User '{}' is disabled", username);

@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.curtisnewbie.module.auth.config.SecurityConfigHolder.ENABLE_ACCESS_LOG_KEY;
+import static com.curtisnewbie.module.auth.config.ModuleConfig.ENABLE_ACCESS_LOG_KEY;
 
 /**
  * @author yongjie.zhuang
@@ -39,7 +39,7 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
     private MessagingService messagingService;
 
     @Autowired
-    private SecurityConfigHolder securityConfigHolder;
+    private ModuleConfig moduleConfig;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -48,14 +48,14 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
         if (extender != null) {
             logger.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
         }
-        if (!securityConfigHolder.isAccessLogEnabled())
+        if (!moduleConfig.isAccessLoginEnabled())
             logger.info("Access log disabled, configure '{}=true' to turn it on", ENABLE_ACCESS_LOG_KEY);
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException, ServletException {
-        if (securityConfigHolder.isAccessLogEnabled())
+        if (moduleConfig.isAccessLoginEnabled())
             logAccessInfoAsync(httpServletRequest, authentication);
         if (extender != null) {
             extender.onAuthenticationSuccess(httpServletRequest, httpServletResponse, authentication);

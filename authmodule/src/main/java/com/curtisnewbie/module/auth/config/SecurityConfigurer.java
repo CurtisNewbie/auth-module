@@ -3,8 +3,6 @@ package com.curtisnewbie.module.auth.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,7 +22,7 @@ import java.util.Arrays;
  * LogoutSuccessHandlerExtender}
  * </p>
  * <p>
- * For settings such as permit all ant patterns, login processing url, see {@link SecurityConfigHolder}
+ * For settings such as permit all ant patterns, login processing url, see {@link ModuleConfig}
  * </p>
  * <p>
  * For more on CORS filter, see {@link CorsConfig}
@@ -47,15 +45,15 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Autowired
     private CorsConfig corsConfig;
     @Autowired
-    private SecurityConfigHolder securityConfigHolder;
+    private ModuleConfig moduleConfig;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // setup which requests are permitted and which requests require authentication
-        if (securityConfigHolder.specifiedPermittedAntPatterns()) {
-            http.authorizeRequests().antMatchers(securityConfigHolder.getPermittedAntPatterns()).permitAll();
+        if (moduleConfig.specifiedPermittedAntPatterns()) {
+            http.authorizeRequests().antMatchers(moduleConfig.getPermittedAntPatterns()).permitAll();
             logger.info("Permit all requests for ant patterns: {}",
-                    Arrays.toString(securityConfigHolder.getPermittedAntPatterns()));
+                    Arrays.toString(moduleConfig.getPermittedAntPatterns()));
         }
 
         // any other requests must be authenticated
@@ -67,16 +65,16 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .successHandler(authenticationSuccessHandlerDelegate)
                 .failureHandler(authenticationFailureHandlerDelegate);
 
-        if (securityConfigHolder.specifiedLoginProcessingUrl()) {
-            http.formLogin().loginProcessingUrl(securityConfigHolder.getLoginProcessingUrl());
-            logger.info("Setup login processing url: {}", securityConfigHolder.getLoginProcessingUrl());
+        if (moduleConfig.specifiedLoginProcessingUrl()) {
+            http.formLogin().loginProcessingUrl(moduleConfig.getLoginProcessingUrl());
+            logger.info("Setup login processing url: {}", moduleConfig.getLoginProcessingUrl());
         }
 
         // if customLoginPage is present, use the custom one instead of the generated one
-        if (securityConfigHolder.specifiedCustomLoginPage()) {
-            logger.info("Using custom login page: {}", securityConfigHolder.getCustomLoginPage());
+        if (moduleConfig.specifiedCustomLoginPage()) {
+            logger.info("Using custom login page: {}", moduleConfig.getCustomLoginPage());
             http.formLogin()
-                    .loginPage(securityConfigHolder.getCustomLoginPage());
+                    .loginPage(moduleConfig.getCustomLoginPage());
         }
 
         // setup logoutUrl and logout success handler (delegate)
@@ -85,9 +83,9 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .clearAuthentication(true)
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler(logoutSuccessHandlerDelegate);
-        if (securityConfigHolder.specifiedLogoutUrl()) {
-            http.logout().logoutUrl(securityConfigHolder.getLogoutUrl());
-            logger.info("Setup logout url: {}", securityConfigHolder.getLogoutUrl());
+        if (moduleConfig.specifiedLogoutUrl()) {
+            http.logout().logoutUrl(moduleConfig.getLogoutUrl());
+            logger.info("Setup logout url: {}", moduleConfig.getLogoutUrl());
         }
 
         // this requires https, and will redirect if necessary

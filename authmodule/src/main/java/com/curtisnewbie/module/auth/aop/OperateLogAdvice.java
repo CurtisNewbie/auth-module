@@ -1,6 +1,6 @@
 package com.curtisnewbie.module.auth.aop;
 
-import com.curtisnewbie.module.auth.config.SecurityConfigHolder;
+import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.module.auth.util.AuthUtil;
 import com.curtisnewbie.module.messaging.service.MessagingParam;
 import com.curtisnewbie.module.messaging.service.MessagingService;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.Date;
 
-import static com.curtisnewbie.module.auth.config.SecurityConfigHolder.ENABLE_OPERATE_LOG_KEY;
+import static com.curtisnewbie.module.auth.config.ModuleConfig.ENABLE_OPERATE_LOG_KEY;
 
 /**
  * Advice for saving operate_log
@@ -43,21 +43,21 @@ public class OperateLogAdvice {
     private static final int MAX_PARAM_LENGTH = 950;
 
     @Autowired
-    private SecurityConfigHolder securityConfigHolder;
+    private ModuleConfig moduleConfig;
 
     @Autowired
     private MessagingService messagingService;
 
     @PostConstruct
     void onInit() {
-        if (!securityConfigHolder.isOperateLogEnabled())
+        if (!moduleConfig.isOperateLogEnabled())
             log.info("Operation log disabled, configure '{}=true' to turn it on", ENABLE_OPERATE_LOG_KEY);
     }
 
     @Around("@annotation(logOperation)")
     public Object logOperation(ProceedingJoinPoint pjp, LogOperation logOperation) throws Throwable {
         try {
-            if (securityConfigHolder.isOperateLogEnabled())
+            if (moduleConfig.isOperateLogEnabled())
                 doAsyncOperationLog(pjp, logOperation);
         } catch (Exception e) {
             log.error("Unable to log operation", e);
