@@ -19,6 +19,12 @@ boolean | authmodule.enable-controller-console-log | enable logging of controlle
 
 This project depends on the following modules that you must manually install (using `mvn clean install`).
 
+- curtisnewbie-bom
+    - description: BOM file for dependency management
+    - url: https://github.com/CurtisNewbie/curtisnewbie-bom
+    - branch: main
+    - under `/microservice` folder
+
 - auth-service-remote
     - description: API layer for using auth-service (via RPC calls)
     - url: https://github.com/CurtisNewbie/auth-service
