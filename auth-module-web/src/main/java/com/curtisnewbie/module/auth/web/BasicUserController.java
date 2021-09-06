@@ -27,8 +27,10 @@ import java.util.Optional;
  * Basic controller for user
  * </p>
  * <p>
- * Provides common endpoints such as registration, getUserInfo and updatePassword, it's not registerd as a bean by
- * default
+ * Provides common endpoints such as registration, getUserInfo and updatePassword
+ * </p>
+ * <p>
+ * The base path is specified using SPEL, it's 'web.base-path'
  * </p>
  *
  * @author yongjie.zhuang
