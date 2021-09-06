@@ -38,7 +38,7 @@ public final class AuthUtil {
      *
      * @param targetPrincipalType (optional) target type of the principal, this param checks whether the target type is
      *                            is assignable from the Principal's class; if not, this method returns false
-     * @deprecated use {@link #getOptionalUserEntity()} instead
+     * @deprecated use {@link #getOptionalUser()} instead
      */
     @Deprecated
     public static boolean isPrincipalPresent(@Nullable Class<?> targetPrincipalType) {
@@ -57,7 +57,7 @@ public final class AuthUtil {
     /**
      * Get current user's authentication
      */
-    public static Optional<UserVo> getOptionalUserEntity() {
+    public static Optional<UserVo> getOptionalUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || auth.getPrincipal() == null || !UserVo.class.isAssignableFrom(auth.getPrincipal().getClass()))
             return Optional.empty();
