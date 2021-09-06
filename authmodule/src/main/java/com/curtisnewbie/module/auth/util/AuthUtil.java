@@ -6,6 +6,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Optional;
+
 /**
  * Utilities class related to Authentication
  *
@@ -36,7 +38,9 @@ public final class AuthUtil {
      *
      * @param targetPrincipalType (optional) target type of the principal, this param checks whether the target type is
      *                            is assignable from the Principal's class; if not, this method returns false
+     * @deprecated use {@link #getOptionalUserEntity()} instead
      */
+    @Deprecated
     public static boolean isPrincipalPresent(@Nullable Class<?> targetPrincipalType) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null)
@@ -48,6 +52,16 @@ public final class AuthUtil {
             return targetPrincipalType.isAssignableFrom(auth.getPrincipal().getClass());
         else
             return true;
+    }
+
+    /**
+     * Get current user's authentication
+     */
+    public static Optional<UserVo> getOptionalUserEntity() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null || !UserVo.class.isAssignableFrom(auth.getPrincipal().getClass()))
+            return Optional.empty();
+        return Optional.of((UserVo) auth.getPrincipal());
     }
 
     /**
