@@ -1,8 +1,6 @@
-package com.curtisnewbie.module.auth.config;
+package com.curtisnewbie.module.auth.processing;
 
-import com.curtisnewbie.module.tracing.common.MdcUtil;
 import com.curtisnewbie.service.auth.remote.api.RemoteUserService;
-import com.curtisnewbie.service.auth.remote.consts.UserRole;
 import com.curtisnewbie.service.auth.remote.exception.PasswordIncorrectException;
 import com.curtisnewbie.service.auth.remote.exception.UserDisabledException;
 import com.curtisnewbie.service.auth.remote.exception.UsernameNotFoundException;
@@ -11,13 +9,17 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -26,35 +28,45 @@ import java.util.Objects;
  * @author yongjie.zhuang
  */
 @Component
-public class AuthProvider implements AuthenticationProvider {
+public class RemoteAuthenticationProvider implements AuthenticationProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthProvider.class);
+    public static final String AUTH_CONTEXT_AUTHENTICATION_OBJECT = "authentication-object";
+    public static final String AUTH_CONTEXT_USER_OBJECT = "user-object";
+
+    private static final Logger logger = LoggerFactory.getLogger(RemoteAuthenticationProvider.class);
 
     @DubboReference(lazy = true)
     private RemoteUserService remoteUserService;
 
-    @Autowired
-    private ModuleConfig moduleConfig;
+    @Autowired(required = false)
+    private List<PreAuthenticationListener> preAuthListeners;
+
+    @Autowired(required = false)
+    private List<PostAuthenticationListener> postAuthListeners;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (authentication.isAuthenticated())
             return authentication;
 
+        final AuthenticationContext authContext = loadAuthenticationContext(authentication);
+
         String username = authentication.getName();
         UserVo user;
         try {
-            // for log tracing
-            MdcUtil.setTraceId(username);
+            // do some operation before authentication
+            doPreAuthentication(authContext);
+
             // attempt to authenticate
             user = remoteUserService.login(username, authentication.getCredentials().toString());
+            Objects.requireNonNull(user);
             logger.info("User '{}' authenticated", username);
 
-            if (moduleConfig.isAdminLoginOnly()
-                    && !Objects.equals(UserRole.ADMIN.getValue(), user.getRole())) {
-                logger.info("Only allow admin to login, reject authentication");
-                throw new InsufficientAuthenticationException("Only admin can login");
-            }
+            // store user object into context map, so that the post authentication listener can have access to it
+            authContext.getContextMap().put(AUTH_CONTEXT_USER_OBJECT, user);
+
+            // do some operation after authentication
+            doPostAuthentication(authContext);
 
             return buildSuccessfulAuthentication(user, authentication);
         } catch (UserDisabledException e) {
@@ -69,6 +81,12 @@ public class AuthProvider implements AuthenticationProvider {
         throw new BadCredentialsException("Incorrect username or password");
     }
 
+    private AuthenticationContext loadAuthenticationContext(Authentication authentication) {
+        AuthenticationContext ctx = new AuthenticationContext();
+        ctx.getContextMap().put(AUTH_CONTEXT_AUTHENTICATION_OBJECT, authentication);
+        return ctx;
+    }
+
     @Override
     public boolean supports(Class<?> authentication) {
         boolean result = UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
@@ -81,4 +99,15 @@ public class AuthProvider implements AuthenticationProvider {
                 au.getCredentials(),
                 Arrays.asList(new SimpleGrantedAuthority(ue.getRole())));
     }
+
+    private void doPreAuthentication(AuthenticationContext ctx) {
+        if (preAuthListeners != null)
+            preAuthListeners.forEach(p -> p.doPreAuthentication(ctx));
+    }
+
+    private void doPostAuthentication(AuthenticationContext ctx) {
+        if (postAuthListeners != null)
+            postAuthListeners.forEach(p -> p.doPostAuthentication(ctx));
+    }
 }
+

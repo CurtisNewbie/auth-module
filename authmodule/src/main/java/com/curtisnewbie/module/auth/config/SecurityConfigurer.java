@@ -1,5 +1,6 @@
 package com.curtisnewbie.module.auth.config;
 
+import com.curtisnewbie.module.auth.processing.RemoteAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfigurer.class);
 
     @Autowired
-    private AuthProvider authProvider;
+    private RemoteAuthenticationProvider authProvider;
     @Autowired
     private AuthenticationSuccessHandlerDelegate authenticationSuccessHandlerDelegate;
     @Autowired
