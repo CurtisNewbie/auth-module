@@ -1,6 +1,6 @@
 # auth-module
 
-Module for web security, user authentication, and integration with **auth-service** (https://github.com/CurtisNewbie/auth-service)
+Module for web security, user authentication, and integration with **auth-service** (https://github.com/CurtisNewbie/auth-service). The one in `authmodule/` will do just what is mentioned in previous sentience, and the one in `auth-module-web/` provides some of the common REST endpoints that are shared in all my webapps, e.g., user registration, get user info and so on.
 
 ## Configuration
 
