@@ -34,6 +34,8 @@ import java.util.Optional;
  * @author yongjie.zhuang
  */
 @Slf4j
+@RestController
+@RequestMapping("${web.base-path}/user")
 public class BasicUserController {
 
     private static final int PASSWORD_LENGTH = 6;
