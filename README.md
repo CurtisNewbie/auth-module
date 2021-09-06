@@ -14,6 +14,7 @@ boolean | authmodule.enable-operate-log | enable logging of user operation, this
 boolean | authmodule.enable-access-log | enable logging of user access, this logs user's login information, this is saved in database asynchronously | true
 boolean | authmodule.permit-admin-login-only | only allow admin to login | false
 boolean | authmodule.enable-controller-console-log | enable logging of controllers' methods, will print out information on console, such as endpoints method parameters, it's useful for debugging | false
+String |  authmodule.application-name | name of current application, this is used to validate if the user that is being authenticated actually has the right to use current application. If it's not specified, then only the username and password are validated (see **auth-service** for more information) | 
 
 ## Modules and Dependencies
 
