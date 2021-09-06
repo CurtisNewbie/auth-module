@@ -10,8 +10,9 @@ import java.util.Map;
  * Context of user authentication
  * </p>
  * <p>
- * Internally contains a map, it's not thread-safe, however, as long as the map is used within the same thread, it's
- * thread-safe
+ * This context internally contains a map, it's used by {@link RemoteAuthenticationProvider} to share information
+ * related to user authentication between the registered listeners. No extra synchronization is used, so this object
+ * should only be used within the same thread.
  * </p>
  *
  * @author yongjie.zhuang
