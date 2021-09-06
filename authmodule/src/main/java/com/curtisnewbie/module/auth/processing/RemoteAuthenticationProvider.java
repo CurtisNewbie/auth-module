@@ -1,18 +1,17 @@
 package com.curtisnewbie.module.auth.processing;
 
+import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.service.auth.remote.api.RemoteUserService;
 import com.curtisnewbie.service.auth.remote.exception.PasswordIncorrectException;
 import com.curtisnewbie.service.auth.remote.exception.UserDisabledException;
+import com.curtisnewbie.service.auth.remote.exception.UserNotAllowedToUseApplicationException;
 import com.curtisnewbie.service.auth.remote.exception.UsernameNotFoundException;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,6 +43,9 @@ public class RemoteAuthenticationProvider implements AuthenticationProvider {
     @Autowired(required = false)
     private List<PostAuthenticationListener> postAuthListeners;
 
+    @Autowired
+    private ModuleConfig moduleConfig;
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (authentication.isAuthenticated())
@@ -57,8 +59,12 @@ public class RemoteAuthenticationProvider implements AuthenticationProvider {
             // do some operation before authentication
             doPreAuthentication(authContext);
 
-            // attempt to authenticate
-            user = remoteUserService.login(username, authentication.getCredentials().toString());
+            // attempt to authenticate, if there is an application name, we validate it
+            final String applicationName = moduleConfig.getApplicationName();
+            if (applicationName != null)
+                user = remoteUserService.login(username, authentication.getCredentials().toString(), applicationName);
+            else
+                user = remoteUserService.login(username, authentication.getCredentials().toString());
             Objects.requireNonNull(user);
             logger.info("User '{}' authenticated", username);
 
@@ -77,8 +83,11 @@ public class RemoteAuthenticationProvider implements AuthenticationProvider {
             throw new org.springframework.security.core.userdetails.UsernameNotFoundException("User '" + username + "' not found");
         } catch (PasswordIncorrectException e) {
             logger.info("Incorrect password for user '{}'", username);
+            throw new BadCredentialsException("Incorrect username or password");
+        } catch (UserNotAllowedToUseApplicationException e) {
+            logger.info("User '{}' not allowed to use this application", username);
+            throw new InsufficientAuthenticationException("User '" + username + "' not allowed to use this application");
         }
-        throw new BadCredentialsException("Incorrect username or password");
     }
 
     private AuthenticationContext loadAuthenticationContext(Authentication authentication) {
