@@ -1,5 +1,7 @@
 package com.curtisnewbie.module.auth.config;
 
+import com.curtisnewbie.common.util.JsonUtils;
+import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.messaging.service.MessagingParam;
 import com.curtisnewbie.module.messaging.service.MessagingService;
 import com.curtisnewbie.service.auth.messaging.routing.AuthServiceRoutingInfo;
@@ -59,6 +61,8 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
             logAccessInfoAsync(httpServletRequest, authentication);
         if (extender != null) {
             extender.onAuthenticationSuccess(httpServletRequest, httpServletResponse, authentication);
+        } else {
+            defaultHandler(httpServletRequest, httpServletResponse, authentication);
         }
     }
 
@@ -87,6 +91,11 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
         } catch (Exception e) {
             logger.error("Unable to save access-log", e);
         }
+    }
+
+    void defaultHandler(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+            throws IOException, ServletException {
+        response.getWriter().write(JsonUtils.writeValueAsString(Result.ok()));
     }
 }
 
