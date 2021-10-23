@@ -7,6 +7,7 @@ import org.springframework.security.core.AuthenticationException;
  *
  * @author yongjie.zhuang
  */
+@FunctionalInterface
 public interface PostAuthenticationListener {
 
     void doPostAuthentication(AuthenticationContext context) throws AuthenticationException;

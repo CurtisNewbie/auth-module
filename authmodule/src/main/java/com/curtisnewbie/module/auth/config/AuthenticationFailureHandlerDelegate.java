@@ -18,6 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * <p>
+ * Delegate for handling authentication failure
+ * </p>
+ * <p>
+ * It will delegate the handling to {@link AuthenticationFailureHandler} if found
+ * </p>
+ *
  * @author yongjie.zhuang
  */
 @Component

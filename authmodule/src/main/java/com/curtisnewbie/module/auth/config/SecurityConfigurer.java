@@ -89,11 +89,6 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
             logger.info("Setup logout url: {}", moduleConfig.getLogoutUrl());
         }
 
-        // this requires https, and will redirect if necessary
-//        http.requiresChannel(channel -> channel
-//                .anyRequest().requiresSecure()
-//        );
-
         // todo enable csrf
         http.cors()
                 .disable()

@@ -1,7 +1,6 @@
 package com.curtisnewbie.module.auth.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -14,18 +13,26 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
+ * <p>
+ * Delegate for handling logout success event
+ * </p>
+ * <p>
+ * It will delegate the handling to {@link LogoutSuccessHandlerExtender} if found
+ * </p>
+ *
  * @author yongjie.zhuang
  */
+@Slf4j
 @Component
 public class LogoutSuccessHandlerDelegate implements LogoutSuccessHandler {
-    private static final Logger logger = LoggerFactory.getLogger(LogoutSuccessHandlerDelegate.class);
+
     @Autowired(required = false)
     private LogoutSuccessHandlerExtender extender;
 
     @PostConstruct
     void postConstruct() {
         if (extender != null) {
-            logger.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
+            log.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
         }
     }
 
