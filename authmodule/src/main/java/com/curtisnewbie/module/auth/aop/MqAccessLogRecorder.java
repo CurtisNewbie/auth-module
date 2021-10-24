@@ -1,4 +1,4 @@
-package com.curtisnewbie.module.auth.processing;
+package com.curtisnewbie.module.auth.aop;
 
 import com.curtisnewbie.module.messaging.service.MessagingParam;
 import com.curtisnewbie.module.messaging.service.MessagingService;
@@ -13,11 +13,15 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
+ * <p>
+ * AccessLog Recorder based on MQ
+ * </p>
+ *
  * @author yongjie.zhuang
  */
 @Slf4j
 @Component
-public class AccessLogRecorderImpl implements AccessLogRecorder {
+public class MqAccessLogRecorder implements AccessLogRecorder {
 
     @Autowired
     private MessagingService messagingService;

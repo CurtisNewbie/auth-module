@@ -1,9 +1,8 @@
 package com.curtisnewbie.module.auth.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -17,10 +16,9 @@ import java.io.IOException;
  *
  * @author yongjie.zhuang
  */
-@Configuration
+@Slf4j
+@Component
 public class CorsConfigImpl implements CorsConfig {
-
-    private static final Logger logger = LoggerFactory.getLogger(CorsConfigImpl.class);
 
     private static final String CORS_IS_FILTER_ENABLED = "authmodule.cors.is-filter-enabled";
     private static final String DEFAULT_IS_FILTER_ENABLED = "false";
@@ -60,7 +58,7 @@ public class CorsConfigImpl implements CorsConfig {
 
     @Override
     public CorsFilter getCustomCorsFilter() {
-        logger.info("Instantiating CORS filter: allowOrigin='{}', allowMethods='{}', allowCredentials='{}', allowHeaders='{}'",
+        log.info("Instantiating CORS filter: allowOrigin='{}', allowMethods='{}', allowCredentials='{}', allowHeaders='{}'",
                 allowOrigin, allowMethods, allowCredentials, allowHeaders);
         return new CorsFilter(allowOrigin, allowMethods, allowCredentials, allowHeaders);
     }

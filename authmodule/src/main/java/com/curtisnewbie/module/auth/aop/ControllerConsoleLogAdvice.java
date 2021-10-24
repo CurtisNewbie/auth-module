@@ -1,26 +1,21 @@
 package com.curtisnewbie.module.auth.aop;
 
-import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
-import javax.annotation.PostConstruct;
-
-import static com.curtisnewbie.module.auth.config.ModuleConfig.PROP_NAME_ENABLE_CONTROLLER_CONSOLE_LOG;
-
 /**
  * Advice that log the controller's method execution
  * <p>
- * This is very useful for debugging, where you get to see the arguments, etc.
+ * This is very useful for debugging, as you can read the actual arguments received and objects returned.
  * </p>
  * <p>
  * It's by default turned off, but you can turn it on by setting property 'auth-module.enable-controller-console-log'
@@ -28,21 +23,14 @@ import static com.curtisnewbie.module.auth.config.ModuleConfig.PROP_NAME_ENABLE_
  *
  * @author yongjie.zhuang
  */
+@Slf4j
 @Aspect
 @Component
+@ConditionalOnProperty(name = "authmodule.enable-controller-console-log", matchIfMissing = true)
 public class ControllerConsoleLogAdvice {
-
-    private static final Logger logger = LoggerFactory.getLogger(ControllerConsoleLogAdvice.class);
 
     @Autowired
     private ModuleConfig moduleConfig;
-
-    @PostConstruct
-    void onInit() {
-        if (!moduleConfig.isControllerConsoleLogEnabled())
-            logger.info("Controller logging on console is disabled, enable it by setting '{}=true'",
-                    PROP_NAME_ENABLE_CONTROLLER_CONSOLE_LOG);
-    }
 
     @Pointcut("within(@org.springframework.stereotype.Controller *) || within(@org.springframework.web.bind.annotation.RestController *)")
     public void controllerPointcut() {
@@ -50,9 +38,6 @@ public class ControllerConsoleLogAdvice {
 
     @Around("controllerPointcut() && execution(* *(..))")
     public Object methodCall(ProceedingJoinPoint pjp) throws Throwable {
-        if (!moduleConfig.isControllerConsoleLogEnabled())
-            return pjp.proceed();
-
         StopWatch sw = new StopWatch();
         Object result = null;
         try {
@@ -61,7 +46,7 @@ public class ControllerConsoleLogAdvice {
             return result;
         } finally {
             sw.stop();
-            logger.info("JoinPoint: '{}', arguments: {}, took '{}' millisec, result: {}",
+            log.info("Pointcut '{}',\n args: '{}',\n took '{}' milliseconds,\n result: '{}'\n",
                     pjp.toShortString(),
                     cvtToStr(pjp.getArgs()),
                     sw.getTotalTimeMillis(),
@@ -73,27 +58,12 @@ public class ControllerConsoleLogAdvice {
         if (args == null)
             return "[ null ]";
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("[ ");
         for (Object o : args) {
-            if (isPrimitiveType(o)) {
-                if (sb.length() > 0)
-                    sb.append(", ");
-                sb.append(o == null ? "null" : "'" + o.toString() + "'");
-            }
+            append(sb, o == null ? "null" : o.toString());
         }
-        sb.insert(0, "[ ");
         sb.append(" ]");
         return sb.toString();
-    }
-
-    private static final boolean isPrimitiveType(Object o) {
-        return o == null
-                || o instanceof String
-                || o instanceof Integer
-                || o instanceof Short
-                || o instanceof Long
-                || o instanceof Double
-                || o instanceof Float;
     }
 
     private static final String respToStr(Object o) {
@@ -110,28 +80,21 @@ public class ControllerConsoleLogAdvice {
             } else {
                 if (respEntity.getBody() instanceof byte[]) {
                     sb.append(((byte[]) respEntity.getBody()).length + " bytes");
-                } else if (respEntity.getBody() instanceof Result) {
-                    Result r = Result.class.cast(respEntity.getBody());
-                    sb.append(resultToStr(r));
                 } else {
                     sb.append(respEntity.getBody().toString());
                 }
             }
             sb.append(" }");
             return sb.toString();
-        } else if (o instanceof Result) {
-            Result r = Result.class.cast(o);
-            return resultToStr(r);
         } else {
             return o.toString();
         }
     }
 
-    private static final String resultToStr(Result r) {
-        StringBuilder sb = new StringBuilder("@Result{ ");
-        sb.append("hasError: ").append(r.isHasError()).append(", ");
-        sb.append("msg: ").append(r.getMsg()).append(", ");
-        sb.append("data: ").append(r.getData() == null ? "null" : "...").append(" }");
-        return sb.toString();
+    private static final void append(StringBuilder sb, String text) {
+        // 2 is the length of ", "
+        if (sb.length() > 2)
+            sb.append(", ");
+        sb.append("'" + text + "'");
     }
 }

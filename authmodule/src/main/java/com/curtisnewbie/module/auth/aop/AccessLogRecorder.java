@@ -1,4 +1,4 @@
-package com.curtisnewbie.module.auth.processing;
+package com.curtisnewbie.module.auth.aop;
 
 /**
  * <p>

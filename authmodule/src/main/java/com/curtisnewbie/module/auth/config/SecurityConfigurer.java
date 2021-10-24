@@ -3,11 +3,11 @@ package com.curtisnewbie.module.auth.config;
 import com.curtisnewbie.module.auth.processing.GenericAuthenticationProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.servlet.Filter;
@@ -31,7 +31,7 @@ import java.util.Arrays;
  * @author yongjie.zhuang
  */
 @Slf4j
-@Configuration
+@Component
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Autowired

@@ -2,8 +2,7 @@ package com.curtisnewbie.module.auth.config;
 
 import com.curtisnewbie.common.util.JsonUtils;
 import com.curtisnewbie.common.vo.Result;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -27,10 +26,9 @@ import java.io.IOException;
  *
  * @author yongjie.zhuang
  */
+@Slf4j
 @Component
 public class AuthenticationFailureHandlerDelegate implements AuthenticationFailureHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFailureHandlerDelegate.class);
 
     @Autowired(required = false)
     private AuthenticationFailureHandlerExtender extender;
@@ -38,7 +36,7 @@ public class AuthenticationFailureHandlerDelegate implements AuthenticationFailu
     @PostConstruct
     void postConstruct() {
         if (extender != null) {
-            logger.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
+            log.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
         }
     }
 

@@ -4,12 +4,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-import org.springframework.lang.Nullable;
-import org.springframework.util.StringUtils;
-
-import javax.annotation.PostConstruct;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>
@@ -28,8 +24,8 @@ import javax.annotation.PostConstruct;
  * @author yongjie.zhuang
  */
 @Data
-@Configuration
 @Slf4j
+@Component
 public class ModuleConfig {
 
     private static final String EMPTY_STRING = "";
@@ -37,14 +33,12 @@ public class ModuleConfig {
     public static final String PROP_NAME_LOGIN_PROCESSING_URL = "authmodule.login-processing-url";
     public static final String PROP_NAME_CUSTOM_LOGIN_PAGE = "authmodule.custom-login-page";
     public static final String PROP_NAME_LOGOUT_URL = "authmodule.logout-url";
-    public static final String PROP_NAME_ENABLE_OPERATE_LOG = "authmodule.enable-operate-log";
     public static final String PROP_NAME_ENABLE_ACCESS_LOG = "authmodule.enable-access-log";
     public static final String PROP_NAME_ONLY_ADMIN_LOGIN = "authmodule.permit-admin-login-only";
-    public static final String PROP_NAME_ENABLE_CONTROLLER_CONSOLE_LOG = "authmodule.enable-controller-console-log";
     public static final String PROP_NAME_APPLICATION_NAME = "authmodule.application-name";
 
-    @Value("${" + PROP_NAME_ENABLE_CONTROLLER_CONSOLE_LOG + ":false}")
-    private boolean controllerConsoleLogEnabled;
+    @Value("${spring.application.name}")
+    private String applicationName;
     @Value("${" + PROP_NAME_PERMITTED_ANT_PATTERNS + ":" + EMPTY_STRING + "}")
     private String[] permittedAntPatterns;
     @Value("${" + PROP_NAME_LOGIN_PROCESSING_URL + ":" + EMPTY_STRING + "}")
@@ -53,28 +47,13 @@ public class ModuleConfig {
     private String customLoginPage;
     @Value("${" + PROP_NAME_LOGOUT_URL + ":" + EMPTY_STRING + "}")
     private String logoutUrl;
-    @Value("${" + PROP_NAME_ENABLE_OPERATE_LOG + ":true}")
-    private boolean operateLogEnabled;
     @Value("${" + PROP_NAME_ENABLE_ACCESS_LOG + ":true}")
     private boolean accessLoginEnabled;
     @Value("${" + PROP_NAME_ONLY_ADMIN_LOGIN + ": false}")
     private boolean adminLoginOnly;
 
-    @Nullable
-    private String applicationName;
-
     @Autowired
     private Environment environment;
-
-    @PostConstruct
-    void init() {
-        String appName = environment.getProperty(PROP_NAME_APPLICATION_NAME);
-        if (StringUtils.hasText(appName))
-            applicationName = appName;
-        else
-            log.info("Value for property '{}=' is not provided, auth-module will not validate user's right to access current application",
-                    PROP_NAME_APPLICATION_NAME);
-    }
 
     /**
      * Check if a custom login page is specified

@@ -2,8 +2,8 @@ package com.curtisnewbie.module.auth.config;
 
 import com.curtisnewbie.common.util.JsonUtils;
 import com.curtisnewbie.common.vo.Result;
-import com.curtisnewbie.module.auth.processing.AccessLogRecorder;
-import com.curtisnewbie.module.auth.processing.RecordAccessCmd;
+import com.curtisnewbie.module.auth.aop.AccessLogRecorder;
+import com.curtisnewbie.module.auth.aop.RecordAccessCmd;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

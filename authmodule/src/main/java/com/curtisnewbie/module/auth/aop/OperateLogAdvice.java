@@ -2,9 +2,6 @@ package com.curtisnewbie.module.auth.aop;
 
 import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.module.auth.util.AuthUtil;
-import com.curtisnewbie.module.messaging.service.MessagingParam;
-import com.curtisnewbie.module.messaging.service.MessagingService;
-import com.curtisnewbie.service.auth.messaging.routing.AuthServiceRoutingInfo;
 import com.curtisnewbie.service.auth.remote.exception.InvalidAuthenticationException;
 import com.curtisnewbie.service.auth.remote.vo.OperateLogVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
@@ -12,14 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
-
-import static com.curtisnewbie.module.auth.config.ModuleConfig.PROP_NAME_ENABLE_OPERATE_LOG;
+import java.util.Optional;
 
 /**
  * Advice for saving operate_log
@@ -36,6 +31,7 @@ import static com.curtisnewbie.module.auth.config.ModuleConfig.PROP_NAME_ENABLE_
 @Slf4j
 @Aspect
 @Component
+@ConditionalOnProperty(name = "authmodule.enable-operate-log", matchIfMissing = true)
 public class OperateLogAdvice {
 
     private static final String ANONYMOUS_NAME = "anonymous";
@@ -46,19 +42,12 @@ public class OperateLogAdvice {
     private ModuleConfig moduleConfig;
 
     @Autowired
-    private MessagingService messagingService;
-
-    @PostConstruct
-    void onInit() {
-        if (!moduleConfig.isOperateLogEnabled())
-            log.info("Operation log disabled, configure '{}=true' to turn it on", PROP_NAME_ENABLE_OPERATE_LOG);
-    }
+    private OperateLogRecorder operateLogRecorder;
 
     @Around("@annotation(logOperation)")
     public Object logOperation(ProceedingJoinPoint pjp, LogOperation logOperation) throws Throwable {
         try {
-            if (moduleConfig.isOperateLogEnabled())
-                doAsyncOperationLog(pjp, logOperation);
+            doAsyncOperationLog(pjp, logOperation);
         } catch (Exception e) {
             log.error("Unable to log operation", e);
         }
@@ -77,7 +66,8 @@ public class OperateLogAdvice {
 
         String username = ANONYMOUS_NAME;
         int userId = ANONYMOUS_ID;
-        if (AuthUtil.isPrincipalPresent(UserVo.class)) {
+        Optional<UserVo> optionalUser = AuthUtil.getOptionalUser();
+        if (optionalUser.isPresent()) {
             UserVo uv = AuthUtil.getUser();
             username = uv.getUsername();
             userId = uv.getId();
@@ -85,16 +75,7 @@ public class OperateLogAdvice {
         v.setUsername(username);
         v.setUserId(userId);
 
-        try {
-            messagingService.send(MessagingParam.builder()
-                    .payload(v)
-                    .exchange(AuthServiceRoutingInfo.SAVE_OPERATE_LOG_ROUTING.getExchange())
-                    .routingKey(AuthServiceRoutingInfo.SAVE_OPERATE_LOG_ROUTING.getRoutingKey())
-                    .deliveryMode(MessageDeliveryMode.NON_PERSISTENT)
-                    .build());
-        } catch (Exception e) {
-            log.error("Unable to save operation log", e);
-        }
+        operateLogRecorder.recordOperation(new RecordOperationCmd(v));
     }
 
     private String toParamString(Object[] args) {
