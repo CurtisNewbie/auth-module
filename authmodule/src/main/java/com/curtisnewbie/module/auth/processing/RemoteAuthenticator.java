@@ -45,10 +45,9 @@ public class RemoteAuthenticator implements Authenticator {
         try {
             UserVo user;
 
-            // attempt to authenticate, if there is an application name, we validate it
-            final String applicationName = moduleConfig.getApplicationName();
-            if (applicationName != null)
-                user = remoteUserService.login(username, auth.getCredentials().toString(), applicationName);
+            // attempt to authenticate, we may also validate whether current user has the right to use current application
+            if (moduleConfig.isUserAppAuthorizationChecked())
+                user = remoteUserService.login(username, auth.getCredentials().toString(), moduleConfig.getApplicationName());
             else
                 user = remoteUserService.login(username, auth.getCredentials().toString());
             Objects.requireNonNull(user);

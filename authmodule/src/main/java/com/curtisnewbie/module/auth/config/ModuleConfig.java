@@ -36,6 +36,7 @@ public class ModuleConfig {
     public static final String PROP_NAME_ENABLE_ACCESS_LOG = "authmodule.enable-access-log";
     public static final String PROP_NAME_ONLY_ADMIN_LOGIN = "authmodule.permit-admin-login-only";
     public static final String PROP_NAME_APPLICATION_NAME = "authmodule.application-name";
+    public static final String PROP_NAME_VALIDATE_APPLICATION_NAME = "authmodule.is-app-authorization-checked";
 
     @Value("${spring.application.name}")
     private String applicationName;
@@ -51,6 +52,8 @@ public class ModuleConfig {
     private boolean accessLoginEnabled;
     @Value("${" + PROP_NAME_ONLY_ADMIN_LOGIN + ": false}")
     private boolean adminLoginOnly;
+    @Value("${" + PROP_NAME_VALIDATE_APPLICATION_NAME + ": false}")
+    private boolean userAppAuthorizationChecked;
 
     @Autowired
     private Environment environment;
