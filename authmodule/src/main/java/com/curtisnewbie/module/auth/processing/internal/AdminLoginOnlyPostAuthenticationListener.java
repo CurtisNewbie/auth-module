@@ -1,7 +1,6 @@
 package com.curtisnewbie.module.auth.processing.internal;
 
 import com.curtisnewbie.module.auth.config.ModuleConfig;
-import com.curtisnewbie.module.auth.processing.RemoteAuthenticationProvider;
 import com.curtisnewbie.module.auth.processing.AuthenticationContext;
 import com.curtisnewbie.module.auth.processing.PostAuthenticationListener;
 import com.curtisnewbie.service.auth.remote.consts.UserRole;
@@ -31,11 +30,9 @@ public class AdminLoginOnlyPostAuthenticationListener implements PostAuthenticat
 
     @Override
     public void doPostAuthentication(AuthenticationContext context) throws AuthenticationException {
-        Object userObj = context.getContextMap().get(RemoteAuthenticationProvider.AUTH_CONTEXT_USER_OBJECT);
-        if (userObj == null)
+        UserVo user = context.getUser();
+        if (user == null)
             return;
-
-        UserVo user = (UserVo) userObj;
 
         if (moduleConfig.isAdminLoginOnly()
                 && !Objects.equals(UserRole.ADMIN.getValue(), user.getRole())) {

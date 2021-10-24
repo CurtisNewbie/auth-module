@@ -1,6 +1,5 @@
 package com.curtisnewbie.module.auth.processing.internal;
 
-import com.curtisnewbie.module.auth.processing.RemoteAuthenticationProvider;
 import com.curtisnewbie.module.auth.processing.AuthenticationContext;
 import com.curtisnewbie.module.auth.processing.PreAuthenticationListener;
 import com.curtisnewbie.module.tracing.common.MdcUtil;
@@ -25,7 +24,7 @@ public class LogTracingPreAuthenticationListener implements PreAuthenticationLis
 
     @Override
     public void doPreAuthentication(AuthenticationContext context) throws AuthenticationException {
-        Authentication auth = (Authentication) context.getContextMap().get(RemoteAuthenticationProvider.AUTH_CONTEXT_AUTHENTICATION_OBJECT);
+        Authentication auth = context.getAuthentication();
         Objects.requireNonNull(auth);
 
         // for log tracing

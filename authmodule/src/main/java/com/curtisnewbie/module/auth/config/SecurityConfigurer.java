@@ -1,8 +1,7 @@
 package com.curtisnewbie.module.auth.config;
 
-import com.curtisnewbie.module.auth.processing.RemoteAuthenticationProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.curtisnewbie.module.auth.processing.GenericAuthenticationProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -31,12 +30,12 @@ import java.util.Arrays;
  *
  * @author yongjie.zhuang
  */
+@Slf4j
 @Configuration
 public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfigurer.class);
 
     @Autowired
-    private RemoteAuthenticationProvider authProvider;
+    private GenericAuthenticationProvider authProvider;
     @Autowired
     private AuthenticationSuccessHandlerDelegate authenticationSuccessHandlerDelegate;
     @Autowired
@@ -53,7 +52,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         // setup which requests are permitted and which requests require authentication
         if (moduleConfig.specifiedPermittedAntPatterns()) {
             http.authorizeRequests().antMatchers(moduleConfig.getPermittedAntPatterns()).permitAll();
-            logger.info("Permit all requests for ant patterns: {}",
+            log.info("Permit all requests for ant patterns: {}",
                     Arrays.toString(moduleConfig.getPermittedAntPatterns()));
         }
 
@@ -68,12 +67,12 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
         if (moduleConfig.specifiedLoginProcessingUrl()) {
             http.formLogin().loginProcessingUrl(moduleConfig.getLoginProcessingUrl());
-            logger.info("Setup login processing url: {}", moduleConfig.getLoginProcessingUrl());
+            log.info("Setup login processing url: {}", moduleConfig.getLoginProcessingUrl());
         }
 
         // if customLoginPage is present, use the custom one instead of the generated one
         if (moduleConfig.specifiedCustomLoginPage()) {
-            logger.info("Using custom login page: {}", moduleConfig.getCustomLoginPage());
+            log.info("Using custom login page: {}", moduleConfig.getCustomLoginPage());
             http.formLogin()
                     .loginPage(moduleConfig.getCustomLoginPage());
         }
@@ -86,7 +85,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .logoutSuccessHandler(logoutSuccessHandlerDelegate);
         if (moduleConfig.specifiedLogoutUrl()) {
             http.logout().logoutUrl(moduleConfig.getLogoutUrl());
-            logger.info("Setup logout url: {}", moduleConfig.getLogoutUrl());
+            log.info("Setup logout url: {}", moduleConfig.getLogoutUrl());
         }
 
         // todo enable csrf
@@ -98,7 +97,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
         // cors configuration
         if (corsConfig.isCustomCorsFilterEnabled()) {
             Filter corsFilter = corsConfig.getCustomCorsFilter();
-            logger.info("Adding customized CORS filter: {}, you may consider using {} instead", corsFilter.getClass().getName(),
+            log.info("Adding customized CORS filter: {}, you may consider using {} instead", corsFilter.getClass().getName(),
                     CorsConfigurationSource.class.getName());
             http.addFilterBefore(corsFilter, LogoutFilter.class);
         }
@@ -106,7 +105,7 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        logger.info("Configuring AuthenticationProvider using: {}", authProvider.getClass());
+        log.info("Configuring AuthenticationProvider using: {}", authProvider.getClass());
         auth.authenticationProvider(authProvider);
     }
 }
