@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -61,7 +61,7 @@ public class OperateLogAdvice {
         OperateLogVo v = new OperateLogVo();
         v.setOperateName(logOperation.name());
         v.setOperateDesc(logOperation.description());
-        v.setOperateTime(new Date());
+        v.setOperateTime(LocalDateTime.now());
         v.setOperateParam(toParamString(pjp.getArgs()));
 
         String username = ANONYMOUS_NAME;

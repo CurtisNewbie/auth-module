@@ -10,7 +10,7 @@ import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -30,7 +30,7 @@ public class MqAccessLogRecorder implements AccessLogRecorder {
     public void recordAccess(RecordAccessCmd cmd) {
         AccessLogInfoVo acsLog = new AccessLogInfoVo();
         acsLog.setIpAddress(cmd.getRemoteAddr());
-        acsLog.setAccessTime(new Date());
+        acsLog.setAccessTime(LocalDateTime.now());
 
         UserVo user = cmd.getUser();
         if (user != null) {
