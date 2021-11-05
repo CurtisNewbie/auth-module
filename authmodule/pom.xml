@@ -37,13 +37,11 @@
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>auth-service-remote</artifactId>
-      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>auth-service-messaging</artifactId>
-      <version>1.0.0</version>
     </dependency>
 
     <dependency>
