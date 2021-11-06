@@ -31,7 +31,7 @@ import java.util.Optional;
 @Slf4j
 @Aspect
 @Component
-@ConditionalOnProperty(name = "authmodule.enable-operate-log", matchIfMissing = true)
+@ConditionalOnProperty(name = "authmodule.enableOperateLog", matchIfMissing = true)
 public class OperateLogAdvice {
 
     private static final String ANONYMOUS_NAME = "anonymous";

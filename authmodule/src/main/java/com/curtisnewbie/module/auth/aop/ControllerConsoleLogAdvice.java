@@ -26,7 +26,7 @@ import org.springframework.util.StopWatch;
 @Slf4j
 @Aspect
 @Component
-@ConditionalOnProperty(name = "authmodule.enable-controller-console-log", matchIfMissing = true)
+@ConditionalOnProperty(name = "authmodule.enableControllerConsoleLog", matchIfMissing = true)
 public class ControllerConsoleLogAdvice {
 
     @Autowired

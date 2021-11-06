@@ -10,6 +10,7 @@ import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -38,6 +39,9 @@ public class RemoteAuthenticator implements Authenticator {
     @Autowired
     private ModuleConfig moduleConfig;
 
+    @Value("${spring.application.name}")
+    private String applicationName;
+
     @Override
     public AuthenticationResult authenticate(Authentication auth) {
         String username = auth.getName();
@@ -46,8 +50,8 @@ public class RemoteAuthenticator implements Authenticator {
             UserVo user;
 
             // attempt to authenticate, we may also validate whether current user has the right to use current application
-            if (moduleConfig.isUserAppAuthorizationChecked())
-                user = remoteUserService.login(username, auth.getCredentials().toString(), moduleConfig.getApplicationName());
+            if (moduleConfig.isAppAuthorizationChecked())
+                user = remoteUserService.login(username, auth.getCredentials().toString(), applicationName);
             else
                 user = remoteUserService.login(username, auth.getCredentials().toString());
             Objects.requireNonNull(user);

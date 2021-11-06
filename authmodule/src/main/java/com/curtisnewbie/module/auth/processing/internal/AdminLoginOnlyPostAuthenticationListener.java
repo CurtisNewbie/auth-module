@@ -34,7 +34,7 @@ public class AdminLoginOnlyPostAuthenticationListener implements PostAuthenticat
         if (user == null)
             return;
 
-        if (moduleConfig.isAdminLoginOnly()
+        if (moduleConfig.isPermitAdminLoginOnly()
                 && !Objects.equals(UserRole.ADMIN.getValue(), user.getRole())) {
 
             log.info("Only allow admin to login, reject authentication");

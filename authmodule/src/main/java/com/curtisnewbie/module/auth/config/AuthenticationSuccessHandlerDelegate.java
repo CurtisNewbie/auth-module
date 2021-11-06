@@ -17,8 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.curtisnewbie.module.auth.config.ModuleConfig.PROP_NAME_ENABLE_ACCESS_LOG;
-
 /**
  * <p>
  * Delegate for handling authentication success
@@ -47,14 +45,14 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
         if (extender != null) {
             log.info("Detected extender, will invoke {}'s implementation", extender.getClass().getName());
         }
-        if (!moduleConfig.isAccessLoginEnabled())
-            log.info("Access log disabled, configure '{}=true' to turn it on", PROP_NAME_ENABLE_ACCESS_LOG);
+        if (!moduleConfig.isEnableAccessLog())
+            log.info("Access log disabled");
     }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
                                         Authentication authentication) throws IOException, ServletException {
-        if (moduleConfig.isAccessLoginEnabled())
+        if (moduleConfig.isEnableAccessLog())
             logAccessInfo(httpServletRequest, authentication);
         if (extender != null) {
             extender.onAuthenticationSuccess(httpServletRequest, httpServletResponse, authentication);

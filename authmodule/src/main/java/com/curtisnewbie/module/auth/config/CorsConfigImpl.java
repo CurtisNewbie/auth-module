@@ -1,8 +1,8 @@
 package com.curtisnewbie.module.auth.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -17,43 +17,29 @@ import java.io.IOException;
  * @author yongjie.zhuang
  */
 @Slf4j
-@Component
+@Configuration
+@ConfigurationProperties("authmodule.cors")
 public class CorsConfigImpl implements CorsConfig {
 
-    private static final String CORS_IS_FILTER_ENABLED = "authmodule.cors.is-filter-enabled";
-    private static final String DEFAULT_IS_FILTER_ENABLED = "false";
-
-    private static final String CORS_ALLOW_ORIGIN_KEY = "authmodule.cors.allow-origin";
     private static final String DEFAULT_ALLOW_ORIGIN = "*";
-
-    private static final String CORS_ALLOW_METHODS_KEY = "authmodule.cors.allow-methods";
     private static final String DEFAULT_ALLOW_METHODS = "POST, GET, OPTIONS";
-
-    private static final String CORS_ALLOW_CREDENTIAL_KEY = "authmodule.cors.allow-credential";
-    private static final String DEFAULT_ALLOW_CREDENTIAL = "false";
-
-    private static final String CORS_ALLOW_HEADERS_KEY = "authmodule.cors.allow-headers";
     private static final String DEFAULT_ALLOW_HEADERS = "content-type, x-gwt-module-base, " +
             "x-gwt-permutation, clientid, longpush, set-cookie";
 
-    @Value("${" + CORS_IS_FILTER_ENABLED + ":" + DEFAULT_IS_FILTER_ENABLED + "}") // default to false
-    private boolean corsFilterEnabled;
-
-    @Value("${" + CORS_ALLOW_ORIGIN_KEY + ":" + DEFAULT_ALLOW_ORIGIN + "}")
-    private String allowOrigin;
-
-    @Value("${" + CORS_ALLOW_METHODS_KEY + ":" + DEFAULT_ALLOW_METHODS + "}")
-    private String allowMethods;
-
-    @Value("${" + CORS_ALLOW_CREDENTIAL_KEY + ":" + DEFAULT_ALLOW_CREDENTIAL + "}")
-    private Boolean allowCredentials;
-
-    @Value("${" + CORS_ALLOW_HEADERS_KEY + ":" + DEFAULT_ALLOW_HEADERS + "}")
-    private String allowHeaders;
+    /** whether CORS filter is enabled */
+    private boolean isFilterEnabled = false;
+    /** Access-Control-Allow-Origin */
+    private String allowOrigin = DEFAULT_ALLOW_ORIGIN;
+    /** Access-Control-Allow-Methods */
+    private String allowMethods = DEFAULT_ALLOW_METHODS;
+    /** Access-Control-Allow-Credentials */
+    private boolean allowCredentials = false;
+    /** Access-Control-Allow-Headers */
+    private String allowHeaders = DEFAULT_ALLOW_HEADERS;
 
     @Override
     public boolean isCustomCorsFilterEnabled() {
-        return corsFilterEnabled;
+        return isFilterEnabled;
     }
 
     @Override
