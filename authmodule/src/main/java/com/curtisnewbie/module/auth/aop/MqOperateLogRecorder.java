@@ -6,7 +6,6 @@ import com.curtisnewbie.service.auth.messaging.routing.AuthServiceRoutingInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * <p>
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
  * @author yongjie.zhuang
  */
 @Slf4j
-@Component
 public class MqOperateLogRecorder implements OperateLogRecorder {
 
     @Autowired

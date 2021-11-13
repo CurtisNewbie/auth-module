@@ -37,7 +37,7 @@ public class AuthenticationSuccessHandlerDelegate implements AuthenticationSucce
     @Autowired
     private ModuleConfig moduleConfig;
 
-    @Autowired
+    @Autowired(required = false)
     private AccessLogRecorder accessLogRecorder;
 
     @PostConstruct
