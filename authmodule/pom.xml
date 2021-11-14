@@ -10,7 +10,7 @@
   </parent>
   <groupId>com.curtisnewbie</groupId>
   <artifactId>auth-module</artifactId>
-  <version>micro-2.0.1</version>
+  <version>micro-2.0.2</version>
   <name>auth-module</name>
   <description>Simple authentication module for microservices</description>
 
@@ -113,7 +113,7 @@
       <dependency>
         <groupId>com.curtisnewbie</groupId>
         <artifactId>curtisnewbie-bom</artifactId>
-        <version>micro-2.0.1</version>
+        <version>micro-2.0.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -125,7 +125,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
     </dependencies>
   </dependencyManagement>
 </project>

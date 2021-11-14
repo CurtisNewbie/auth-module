@@ -8,9 +8,10 @@
     <version>2.5.3</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
+
   <groupId>com.curtisnewbie</groupId>
   <artifactId>auth-module-web</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <name>auth-module-web</name>
   <description>Authentication web module that provides common reusable REST endpoints</description>
   <properties>
@@ -74,7 +75,7 @@
       <dependency>
         <groupId>com.curtisnewbie</groupId>
         <artifactId>curtisnewbie-bom</artifactId>
-        <version>micro-2.0.1</version>
+        <version>micro-2.0.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
