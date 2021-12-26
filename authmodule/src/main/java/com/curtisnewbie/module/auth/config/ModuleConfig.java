@@ -35,7 +35,7 @@ public class ModuleConfig {
     private String logoutUrl = null;
     private boolean enableAccessLog = true;
     private boolean permitAdminLoginOnly = false;
-    private boolean isAppAuthorizationChecked = false;
+    private boolean appAuthorizationChecked = false;
 
     @Autowired
     private Environment environment;
