@@ -11,7 +11,7 @@
 
   <groupId>com.curtisnewbie</groupId>
   <artifactId>auth-module-web</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <name>auth-module-web</name>
   <description>Authentication web module that provides common reusable REST endpoints</description>
   <properties>
