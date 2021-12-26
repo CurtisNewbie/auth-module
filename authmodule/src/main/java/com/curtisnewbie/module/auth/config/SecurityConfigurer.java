@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -64,7 +65,6 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .successHandler(authenticationSuccessHandlerDelegate)
                 .failureHandler(authenticationFailureHandlerDelegate);
-
         if (moduleConfig.specifiedLoginProcessingUrl()) {
             http.formLogin().loginProcessingUrl(moduleConfig.getLoginProcessingUrl());
             log.info("Setup login processing url: {}", moduleConfig.getLoginProcessingUrl());
@@ -101,6 +101,11 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
                     CorsConfigurationSource.class.getName());
             http.addFilterBefore(corsFilter, LogoutFilter.class);
         }
+
+        // jwt-based authentication
+        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter();
+        jwtAuthenticationFilter.setAuthenticationManager(authenticationManager());
+        http.addFilterBefore(jwtAuthenticationFilter, AnonymousAuthenticationFilter.class);
     }
 
     @Override

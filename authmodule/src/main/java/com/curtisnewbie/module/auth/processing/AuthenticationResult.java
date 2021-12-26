@@ -1,7 +1,7 @@
 package com.curtisnewbie.module.auth.processing;
 
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.Authentication;
 
@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
  * @author yongjie.zhuang
  */
 @Data
-@AllArgsConstructor
 public class AuthenticationResult {
 
     /**

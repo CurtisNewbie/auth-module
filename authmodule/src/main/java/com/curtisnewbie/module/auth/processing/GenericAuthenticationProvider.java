@@ -6,9 +6,11 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * <p>
@@ -36,7 +38,7 @@ public class GenericAuthenticationProvider implements AuthenticationProvider {
     private List<PostAuthenticationListener> postAuthListeners;
 
     @Autowired
-    private Authenticator authenticator;
+    private List<Authenticator> authenticators;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -49,7 +51,9 @@ public class GenericAuthenticationProvider implements AuthenticationProvider {
         doPreAuthentication(authContext);
 
         // do authentication
-        AuthenticationResult result = authenticator.authenticate(authentication);
+        Optional<Authenticator> authOpt = findAuthenticator(authentication.getClass());
+        Assert.isTrue(authOpt.isPresent(), "Unable able to find the supported authenticator");
+        AuthenticationResult result = authOpt.get().authenticate(authentication);
         Objects.requireNonNull(result);
 
         // store user object into context map, so that the post authentication listener can have access to it
@@ -68,9 +72,18 @@ public class GenericAuthenticationProvider implements AuthenticationProvider {
         return ctx;
     }
 
+    /** Find {@link Authenticator} that supports this authentication */
+    private Optional<Authenticator> findAuthenticator(Class<?> authentication) {
+        for (Authenticator auth : authenticators)
+            if (auth.supports(authentication))
+                return Optional.of(auth);
+
+        return Optional.empty();
+    }
+
     @Override
     public boolean supports(Class<?> authentication) {
-        return authenticator.supports(authentication);
+        return findAuthenticator(authentication).isPresent();
     }
 
     private void doPreAuthentication(AuthenticationContext ctx) {
