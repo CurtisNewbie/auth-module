@@ -16,6 +16,8 @@
 
   <properties>
     <java.version>1.8</java.version>
+    <messaging-module.version>2.0.2</messaging-module.version>
+    <auth-service-messaging.version>1.0.3-SNAPSHOT</auth-service-messaging.version>
   </properties>
 
   <dependencies>
@@ -42,6 +44,7 @@
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>auth-service-messaging</artifactId>
+      <version>${auth-service-messaging.version}</version>
     </dependency>
 
     <dependency>
@@ -67,6 +70,7 @@
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>messaging-module</artifactId>
+      <version>${messaging-module.version}</version>
     </dependency>
 
     <!-- https://github.com/CurtisNewbie/comment-generator -->
