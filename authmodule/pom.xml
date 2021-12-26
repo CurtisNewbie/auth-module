@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.curtisnewbie</groupId>
     <artifactId>curtisnewbie-bom</artifactId>
-    <version>micro-2.0.2</version>
+    <version>micro-2.0.3-SNAPSHOT</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.curtisnewbie</groupId>
@@ -16,8 +16,11 @@
 
   <properties>
     <java.version>1.8</java.version>
+    <log-tracing-module.version>2.0.1</log-tracing-module.version>
+    <common-module.version>2.0.2</common-module.version>
     <messaging-module.version>2.0.2</messaging-module.version>
     <auth-service-messaging.version>1.0.3-SNAPSHOT</auth-service-messaging.version>
+    <auth-service-remote.version>1.0.3-SNAPSHOT</auth-service-remote.version>
   </properties>
 
   <dependencies>
@@ -39,6 +42,7 @@
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>auth-service-remote</artifactId>
+      <version>${auth-service-remote.version}</version>
     </dependency>
 
     <dependency>
@@ -60,11 +64,13 @@
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>common-module</artifactId>
+      <version>${common-module.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>log-tracing-module</artifactId>
+      <version>${log-tracing-module.version}</version>
     </dependency>
 
     <dependency>
@@ -73,12 +79,6 @@
       <version>${messaging-module.version}</version>
     </dependency>
 
-    <!-- https://github.com/CurtisNewbie/comment-generator -->
-    <!--    <dependency>-->
-    <!--      <groupId>com.curtisnewbie</groupId>-->
-    <!--      <artifactId>comment-generator</artifactId>-->
-    <!--    </dependency>-->
-    <!-- https://github.com/CurtisNewbie/common-module -->
   </dependencies>
   <build>
     <plugins>
