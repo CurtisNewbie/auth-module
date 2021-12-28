@@ -1,10 +1,10 @@
 package com.curtisnewbie.module.auth.processing;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.curtisnewbie.module.auth.config.JwtAuthenticationToken;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.module.jwt.domain.api.JwtDecoder;
+import com.curtisnewbie.module.jwt.vo.DecodeResult;
 import com.curtisnewbie.service.auth.remote.api.RemoteUserAppService;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
@@ -48,30 +48,30 @@ public class JwtAuthenticator implements Authenticator {
         Assert.notNull(credentials, "token == null, unable to retrieve JWT");
         final String encoded = credentials.toString();
 
-        try {
-            DecodedJWT decoded = jwtDecoder.decode(encoded);
-            UserVo userVo = new UserVo();
-            userVo.setId(Integer.parseInt(decoded.getClaim("id").asString()));
-            userVo.setUsername(decoded.getClaim("username").asString());
-            userVo.setRole(decoded.getClaim("role").asString());
+        final DecodeResult decodeResult = jwtDecoder.decode(encoded);
+        if (!decodeResult.isValid())
+            throw new BadCredentialsException("JWT invalid" + (decodeResult.isExpired() ? ", token expired" : ""));
 
-            Assert.notNull(userVo.getId(), "id == null");
-            Assert.notNull(userVo.getUsername(), "username == null");
-            Assert.notNull(userVo.getRole(), "role == null");
+        final DecodedJWT decoded = decodeResult.getDecodedJWT();
+        UserVo userVo = new UserVo();
+        userVo.setId(Integer.parseInt(decoded.getClaim("id").asString()));
+        userVo.setUsername(decoded.getClaim("username").asString());
+        userVo.setRole(decoded.getClaim("role").asString());
 
-            if (moduleConfig.isAppAuthorizationChecked()
-                    && !remoteUserAppService.isUserAllowedToUseApp(userVo.getId(), applicationName)) {
-                log.info("User '{}' not allowed to use this application", userVo.getUsername());
-                throw new InsufficientAuthenticationException("User '" + userVo.getUsername() + "' not allowed to use this application");
-            }
+        Assert.notNull(userVo.getId(), "id == null");
+        Assert.notNull(userVo.getUsername(), "username == null");
+        Assert.notNull(userVo.getRole(), "role == null");
 
-            JwtAuthenticationToken token = new JwtAuthenticationToken(encoded,
-                    userVo,
-                    Arrays.asList(new SimpleGrantedAuthority(userVo.getRole())));
-            return new AuthenticationResult(token, userVo);
-        } catch (JWTVerificationException e) {
-            throw new BadCredentialsException("JWT invalid", e);
+        if (moduleConfig.isAppAuthorizationChecked()
+                && !remoteUserAppService.isUserAllowedToUseApp(userVo.getId(), applicationName)) {
+            log.info("User '{}' not allowed to use this application", userVo.getUsername());
+            throw new InsufficientAuthenticationException("User '" + userVo.getUsername() + "' not allowed to use this application");
         }
+
+        JwtAuthenticationToken token = new JwtAuthenticationToken(encoded,
+                userVo,
+                Arrays.asList(new SimpleGrantedAuthority(userVo.getRole())));
+        return new AuthenticationResult(token, userVo);
     }
 
     @Override
