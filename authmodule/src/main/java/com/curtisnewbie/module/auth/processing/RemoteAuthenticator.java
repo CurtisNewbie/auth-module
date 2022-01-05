@@ -7,6 +7,7 @@ import com.curtisnewbie.service.auth.remote.exception.UserDisabledException;
 import com.curtisnewbie.service.auth.remote.exception.UserNotAllowedToUseApplicationException;
 import com.curtisnewbie.service.auth.remote.exception.UsernameNotFoundException;
 import com.curtisnewbie.service.auth.remote.feign.UserServiceFeign;
+import com.curtisnewbie.service.auth.remote.vo.LoginVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,17 @@ public class RemoteAuthenticator implements Authenticator {
 
         try {
             Result<UserVo> userResult;
+            final LoginVo loginVo = LoginVo.builder()
+                    .username(username)
+                    .password(auth.getCredentials().toString())
+                    .appName(applicationName)
+                    .build();
 
             // attempt to authenticate, we may also validate whether current user has the right to use current application
             if (moduleConfig.isAppAuthorizationChecked())
-                userResult = remoteUserService.login(username, auth.getCredentials().toString(), applicationName);
+                userResult = remoteUserService.loginForApp(loginVo);
             else
-                userResult = remoteUserService.login(username, auth.getCredentials().toString());
+                userResult = remoteUserService.login(loginVo);
 
             userResult.assertIsOk();
 
