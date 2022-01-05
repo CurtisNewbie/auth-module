@@ -1,14 +1,14 @@
 package com.curtisnewbie.module.auth.processing;
 
+import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
-import com.curtisnewbie.service.auth.remote.api.RemoteUserService;
 import com.curtisnewbie.service.auth.remote.exception.PasswordIncorrectException;
 import com.curtisnewbie.service.auth.remote.exception.UserDisabledException;
 import com.curtisnewbie.service.auth.remote.exception.UserNotAllowedToUseApplicationException;
 import com.curtisnewbie.service.auth.remote.exception.UsernameNotFoundException;
+import com.curtisnewbie.service.auth.remote.feign.UserServiceFeign;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,7 +20,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * <p>
@@ -33,8 +32,8 @@ import java.util.Objects;
 @Component
 public class RemoteAuthenticator implements Authenticator {
 
-    @DubboReference
-    private RemoteUserService remoteUserService;
+    @Autowired
+    private UserServiceFeign remoteUserService;
 
     @Autowired
     private ModuleConfig moduleConfig;
@@ -47,17 +46,18 @@ public class RemoteAuthenticator implements Authenticator {
         String username = auth.getName();
 
         try {
-            UserVo user;
+            Result<UserVo> userResult;
 
             // attempt to authenticate, we may also validate whether current user has the right to use current application
             if (moduleConfig.isAppAuthorizationChecked())
-                user = remoteUserService.login(username, auth.getCredentials().toString(), applicationName);
+                userResult = remoteUserService.login(username, auth.getCredentials().toString(), applicationName);
             else
-                user = remoteUserService.login(username, auth.getCredentials().toString());
-            Objects.requireNonNull(user);
+                userResult = remoteUserService.login(username, auth.getCredentials().toString());
+
+            userResult.assertIsOk();
 
             log.info("User '{}' authenticated", username);
-            return buildSuccessfulAuthentication(user, auth);
+            return buildSuccessfulAuthentication(userResult.getData(), auth);
 
         } catch (UserDisabledException e) {
             log.info("User '{}' is disabled", username);

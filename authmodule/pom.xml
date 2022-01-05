@@ -11,17 +11,17 @@
 
   <groupId>com.curtisnewbie</groupId>
   <artifactId>auth-module</artifactId>
-  <version>micro-2.0.4-SNAPSHOT</version>
+  <version>micro-2.0.5-SNAPSHOT</version>
   <name>auth-module</name>
   <description>Simple authentication module for microservices</description>
 
   <properties>
     <java.version>1.8</java.version>
     <log-tracing-module.version>2.0.2-SNAPSHOT</log-tracing-module.version>
-    <common-module.version>2.0.3-SNAPSHOT</common-module.version>
+    <common-module.version>2.0.4-SNAPSHOT</common-module.version>
     <messaging-module.version>2.0.3-SNAPSHOT</messaging-module.version>
     <auth-service-messaging.version>1.0.3-SNAPSHOT</auth-service-messaging.version>
-    <auth-service-remote.version>1.0.4-SNAPSHOT</auth-service-remote.version>
+    <auth-service-remote.version>1.0.5-SNAPSHOT</auth-service-remote.version>
     <jwt-module.version>1.0.1-SNAPSHOT</jwt-module.version>
   </properties>
 
@@ -57,16 +57,17 @@
       <groupId>com.curtisnewbie</groupId>
       <artifactId>auth-service-messaging</artifactId>
       <version>${auth-service-messaging.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.curtisnewbie</groupId>
+          <artifactId>auth-service-remote</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>com.alibaba.cloud</groupId>
       <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.alibaba.cloud</groupId>
-      <artifactId>spring-cloud-starter-dubbo</artifactId>
     </dependency>
 
     <dependency>

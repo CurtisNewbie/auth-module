@@ -1,14 +1,14 @@
 package com.curtisnewbie.module.auth.processing;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.auth.config.JwtAuthenticationToken;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.module.jwt.domain.api.JwtDecoder;
 import com.curtisnewbie.module.jwt.vo.DecodeResult;
-import com.curtisnewbie.service.auth.remote.api.RemoteUserAppService;
+import com.curtisnewbie.service.auth.remote.feign.UserAppServiceFeign;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -39,8 +39,8 @@ public class JwtAuthenticator implements Authenticator {
     @Value("${spring.application.name}")
     private String applicationName;
 
-    @DubboReference
-    private RemoteUserAppService remoteUserAppService;
+    @Autowired
+    private UserAppServiceFeign userAppServiceFeign;
 
     @Override
     public AuthenticationResult authenticate(Authentication auth) throws AuthenticationException {
@@ -62,8 +62,10 @@ public class JwtAuthenticator implements Authenticator {
         Assert.notNull(userVo.getUsername(), "username == null");
         Assert.notNull(userVo.getRole(), "role == null");
 
-        if (moduleConfig.isAppAuthorizationChecked()
-                && !remoteUserAppService.isUserAllowedToUseApp(userVo.getId(), applicationName)) {
+        final Result<Boolean> isUserAllowedRes = userAppServiceFeign.isUserAllowedToUseApp(userVo.getId(), applicationName);
+        isUserAllowedRes.assertIsOk();
+
+        if (moduleConfig.isAppAuthorizationChecked() && !isUserAllowedRes.getData()) {
             log.info("User '{}' not allowed to use this application", userVo.getUsername());
             throw new InsufficientAuthenticationException("User '" + userVo.getUsername() + "' not allowed to use this application");
         }
