@@ -11,11 +11,11 @@
 
   <groupId>com.curtisnewbie</groupId>
   <artifactId>auth-module-web</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.4-SNAPSHOT</version>
   <name>auth-module-web</name>
   <description>Authentication web module that provides common reusable REST endpoints</description>
   <properties>
-    <auth-module.version>micro-2.0.3-SNAPSHOT</auth-module.version>
+    <auth-module.version>micro-2.0.5-SNAPSHOT</auth-module.version>
     <java.version>8</java.version>
   </properties>
   <dependencies>

@@ -62,6 +62,7 @@ public class JwtAuthenticator implements Authenticator {
         Assert.notNull(userVo.getUsername(), "username == null");
         Assert.notNull(userVo.getRole(), "role == null");
 
+        // todo store this in JWT
         final Result<Boolean> isUserAllowedRes = userAppServiceFeign.isUserAllowedToUseApp(userVo.getId(), applicationName);
         isUserAllowedRes.assertIsOk();
 
