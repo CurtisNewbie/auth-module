@@ -1,7 +1,6 @@
 package com.curtisnewbie.module.auth.processing;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.auth.config.JwtAuthenticationToken;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.module.jwt.domain.api.JwtDecoder;
@@ -62,11 +61,14 @@ public class JwtAuthenticator implements Authenticator {
         Assert.notNull(userVo.getUsername(), "username == null");
         Assert.notNull(userVo.getRole(), "role == null");
 
-        // todo store this in JWT
-        final Result<Boolean> isUserAllowedRes = userAppServiceFeign.isUserAllowedToUseApp(userVo.getId(), applicationName);
-        isUserAllowedRes.assertIsOk();
+        boolean isUserAllowed = true;
 
-        if (moduleConfig.isAppAuthorizationChecked() && !isUserAllowedRes.getData()) {
+        if (moduleConfig.isAppAuthorizationChecked())
+            isUserAllowed = decoded.getClaims().containsKey("appNames") &&
+                    Arrays.stream(decoded.getClaim("appNames").asString().split(","))
+                            .anyMatch(name -> name.equals(applicationName));
+
+        if (!isUserAllowed) {
             log.info("User '{}' not allowed to use this application", userVo.getUsername());
             throw new InsufficientAuthenticationException("User '" + userVo.getUsername() + "' not allowed to use this application");
         }
