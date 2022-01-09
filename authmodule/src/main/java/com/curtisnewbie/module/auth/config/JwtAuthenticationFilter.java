@@ -15,14 +15,14 @@ import java.io.IOException;
 /**
  * JWT based authentication processing filter
  * <p>
- * Will only process requests that have "auth-token" header
+ * Will only process requests that have "Authorization" header
  * </p>
  *
  * @author yongjie.zhuang
  */
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final String TOKEN_HEADER = "auth-token";
+    private static final String TOKEN_HEADER = "Authorization";
 
     protected JwtAuthenticationFilter() {
         super(new RequestHeaderRequestMatcher(TOKEN_HEADER));
