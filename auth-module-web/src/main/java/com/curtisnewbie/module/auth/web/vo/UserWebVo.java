@@ -1,5 +1,6 @@
 package com.curtisnewbie.module.auth.web.vo;
 
+import com.curtisnewbie.service.auth.remote.consts.UserRole;
 import lombok.Data;
 
 /**
@@ -19,5 +20,5 @@ public class UserWebVo {
     /**
      * role
      */
-    private String role;
+    private UserRole role;
 }
