@@ -89,7 +89,7 @@ public class RemoteAuthenticator implements Authenticator {
     private static AuthenticationResult buildSuccessfulAuthentication(UserVo ue, Authentication au) {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(ue,
                 au.getCredentials(),
-                Arrays.asList(new SimpleGrantedAuthority(ue.getRole())));
+                Arrays.asList(new SimpleGrantedAuthority(ue.getRole().getValue())));
 
         return new AuthenticationResult(token, ue);
     }

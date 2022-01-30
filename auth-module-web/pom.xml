@@ -4,20 +4,20 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.curtisnewbie</groupId>
-    <artifactId>curtisnewbie-bom</artifactId>
-    <version>micro-2.0.3-SNAPSHOT</version>
+    <artifactId>auth-module-parent</artifactId>
+    <version>2.0.6-SNAPSHOT</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <groupId>com.curtisnewbie</groupId>
   <artifactId>auth-module-web</artifactId>
-  <version>1.0.4-SNAPSHOT</version>
   <name>auth-module-web</name>
   <description>Authentication web module that provides common reusable REST endpoints</description>
+
   <properties>
-    <auth-module.version>micro-2.0.5-SNAPSHOT</auth-module.version>
     <java.version>8</java.version>
   </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -33,9 +33,10 @@
     <dependency>
       <groupId>com.curtisnewbie</groupId>
       <artifactId>auth-module</artifactId>
-      <version>${auth-module.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
+
   </dependencies>
 
   <build>

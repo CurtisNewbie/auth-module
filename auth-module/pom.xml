@@ -4,14 +4,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.curtisnewbie</groupId>
-    <artifactId>curtisnewbie-bom</artifactId>
-    <version>micro-2.0.3-SNAPSHOT</version>
+    <artifactId>auth-module-parent</artifactId>
+    <version>2.0.6-SNAPSHOT</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <groupId>com.curtisnewbie</groupId>
   <artifactId>auth-module</artifactId>
-  <version>micro-2.0.6-SNAPSHOT</version>
   <name>auth-module</name>
   <description>Simple authentication module for microservices</description>
 
@@ -21,7 +20,7 @@
     <common-module.version>2.0.4-SNAPSHOT</common-module.version>
     <messaging-module.version>2.0.3-SNAPSHOT</messaging-module.version>
     <auth-service-messaging.version>1.0.3-SNAPSHOT</auth-service-messaging.version>
-    <auth-service-remote.version>1.0.5-SNAPSHOT</auth-service-remote.version>
+    <auth-service-remote.version>1.0.8-SNAPSHOT</auth-service-remote.version>
     <jwt-module.version>1.0.1-SNAPSHOT</jwt-module.version>
   </properties>
 

@@ -27,3 +27,7 @@ hs_err_pid*
 
 # ssl certificates PKCS#12
 *.p12
+
+# ide
+.idea/
+*.iml

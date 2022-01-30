@@ -7,13 +7,14 @@ import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.auth.aop.LogOperation;
 import com.curtisnewbie.module.auth.util.AuthUtil;
 import com.curtisnewbie.module.auth.web.vo.RequestRegisterUserWebVo;
-import com.curtisnewbie.module.auth.web.vo.UpdatePasswordVo;
+import com.curtisnewbie.module.auth.web.vo.UpdatePasswordWebVo;
 import com.curtisnewbie.module.auth.web.vo.UserWebVo;
 import com.curtisnewbie.service.auth.remote.consts.UserRole;
 import com.curtisnewbie.service.auth.remote.exception.InvalidAuthenticationException;
 import com.curtisnewbie.service.auth.remote.exception.UserRelatedException;
 import com.curtisnewbie.service.auth.remote.feign.UserServiceFeign;
 import com.curtisnewbie.service.auth.remote.vo.RegisterUserVo;
+import com.curtisnewbie.service.auth.remote.vo.UpdatePasswordVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -71,7 +72,6 @@ public class BasicUserController {
         return userService.requestRegistrationApproval(vo);
     }
 
-    @LogOperation(name = "/user/info", description = "get user info", enabled = false)
     @GetMapping("/info")
     public Result<UserWebVo> getUserInfo() throws InvalidAuthenticationException {
         // user is not authenticated yet
@@ -85,7 +85,7 @@ public class BasicUserController {
 
     @LogOperation(name = "/user/password/update", description = "update password")
     @PostMapping("/password/update")
-    public Result<Void> updatePassword(@RequestBody UpdatePasswordVo vo) throws MsgEmbeddedException, InvalidAuthenticationException {
+    public Result<Void> updatePassword(@RequestBody UpdatePasswordWebVo vo) throws MsgEmbeddedException, InvalidAuthenticationException {
         ValidUtils.requireNotEmpty(vo.getNewPassword());
         ValidUtils.requireNotEmpty(vo.getPrevPassword());
 
@@ -98,7 +98,11 @@ public class BasicUserController {
 
         UserVo uv = AuthUtil.getUser();
         try {
-            return userService.updatePassword(vo.getNewPassword(), vo.getPrevPassword(), uv.getId());
+            return userService.updatePassword(UpdatePasswordVo.builder()
+                    .oldPassword(vo.getPrevPassword())
+                    .newPassword(vo.getNewPassword())
+                    .userId(uv.getId())
+                    .build());
         } catch (UserRelatedException ignore) {
             return Result.error("Password incorrect");
         }

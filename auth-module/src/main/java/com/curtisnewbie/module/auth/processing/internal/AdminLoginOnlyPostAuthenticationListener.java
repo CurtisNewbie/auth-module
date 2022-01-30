@@ -13,8 +13,6 @@ import org.springframework.security.authentication.InsufficientAuthenticationExc
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-
 /**
  * PostAuthenticationListener that validates if current application only allows admin to login
  *
@@ -34,8 +32,7 @@ public class AdminLoginOnlyPostAuthenticationListener implements PostAuthenticat
         if (user == null)
             return;
 
-        if (moduleConfig.isPermitAdminLoginOnly()
-                && !Objects.equals(UserRole.ADMIN.getValue(), user.getRole())) {
+        if (moduleConfig.isPermitAdminLoginOnly() && UserRole.ADMIN != user.getRole()) {
 
             log.info("Only allow admin to login, reject authentication");
             throw new InsufficientAuthenticationException("Only admin can login");

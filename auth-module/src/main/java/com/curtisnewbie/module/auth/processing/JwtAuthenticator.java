@@ -1,10 +1,12 @@
 package com.curtisnewbie.module.auth.processing;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.curtisnewbie.common.util.EnumUtils;
 import com.curtisnewbie.module.auth.config.JwtAuthenticationToken;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.module.jwt.domain.api.JwtDecoder;
 import com.curtisnewbie.module.jwt.vo.DecodeResult;
+import com.curtisnewbie.service.auth.remote.consts.UserRole;
 import com.curtisnewbie.service.auth.remote.feign.UserAppServiceFeign;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +57,7 @@ public class JwtAuthenticator implements Authenticator {
         UserVo userVo = new UserVo();
         userVo.setId(Integer.parseInt(decoded.getClaim("id").asString()));
         userVo.setUsername(decoded.getClaim("username").asString());
-        userVo.setRole(decoded.getClaim("role").asString());
+        userVo.setRole(EnumUtils.parse(decoded.getClaim("role").asString(), UserRole.class));
 
         Assert.notNull(userVo.getId(), "id == null");
         Assert.notNull(userVo.getUsername(), "username == null");
@@ -75,7 +77,7 @@ public class JwtAuthenticator implements Authenticator {
 
         JwtAuthenticationToken token = new JwtAuthenticationToken(encoded,
                 userVo,
-                Arrays.asList(new SimpleGrantedAuthority(userVo.getRole())));
+                Arrays.asList(new SimpleGrantedAuthority(userVo.getRole().getValue())));
         return new AuthenticationResult(token, userVo);
     }
 
