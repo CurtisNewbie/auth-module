@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import static com.curtisnewbie.common.util.AssertUtils.nonNull;
+import static java.lang.String.format;
+
 /**
  * <p>
  * Authenticator based on remote RPC call to auth-service
@@ -56,6 +59,7 @@ public class RemoteAuthenticator implements Authenticator {
 
             // throw exception if notOk
             userResult.assertIsOk();
+            nonNull(userResult.getData(), format("Unable to find user '%s'", username));
 
             log.info("User '{}' authenticated", username);
             return buildSuccessfulAuthentication(userResult.getData(), auth);
