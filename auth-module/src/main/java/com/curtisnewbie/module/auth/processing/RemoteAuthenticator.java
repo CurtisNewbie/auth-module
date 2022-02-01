@@ -1,6 +1,5 @@
 package com.curtisnewbie.module.auth.processing;
 
-import com.curtisnewbie.common.exceptions.UnrecoverableException;
 import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.service.auth.remote.feign.UserServiceFeign;
@@ -43,31 +42,25 @@ public class RemoteAuthenticator implements Authenticator {
     public AuthenticationResult authenticate(Authentication auth) {
         String username = auth.getName();
 
-        try {
-            Result<UserVo> userResult;
-            final LoginVo loginVo = LoginVo.builder()
-                    .username(username)
-                    .password(auth.getCredentials().toString())
-                    .appName(applicationName)
-                    .build();
+        final LoginVo loginVo = LoginVo.builder()
+                .username(username)
+                .password(auth.getCredentials().toString())
+                .appName(applicationName)
+                .build();
 
-            // attempt to authenticate, we may also validate whether current user has the right to use current application
-            if (moduleConfig.isAppAuthorizationChecked())
-                userResult = remoteUserService.loginForApp(loginVo);
-            else
-                userResult = remoteUserService.login(loginVo);
+        // attempt to authenticate, we may also validate whether current user has the right to use current application
+        final Result<UserVo> userResult;
+        if (moduleConfig.isAppAuthorizationChecked())
+            userResult = remoteUserService.loginForApp(loginVo);
+        else
+            userResult = remoteUserService.login(loginVo);
 
-            // throw exception if notOk
-            userResult.assertIsOk();
-            nonNull(userResult.getData(), format("Unable to find user '%s'", username));
+        // throw exception if notOk
+        userResult.assertIsOk();
+        nonNull(userResult.getData(), format("Unable to find user '%s'", username));
 
-            log.info("User '{}' authenticated", username);
-            return buildSuccessfulAuthentication(userResult.getData(), auth);
-
-        } catch (Exception e) {
-            // todo this won't happen, but we keep this before we change auth-service-remote
-            throw new UnrecoverableException(e.getMessage(), e);
-        }
+        log.info("User '{}' authenticated", username);
+        return buildSuccessfulAuthentication(userResult.getData(), auth);
     }
 
     @Override
