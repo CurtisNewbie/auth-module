@@ -4,8 +4,6 @@ import com.curtisnewbie.common.util.JsonUtils;
 import com.curtisnewbie.common.vo.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -52,13 +50,7 @@ public class AuthenticationFailureHandlerDelegate implements AuthenticationFailu
 
     private void defaultHandler(HttpServletRequest request, HttpServletResponse response, AuthenticationException e)
             throws IOException, ServletException {
-        String errorMsg = "Incorrect credentials";
-        if (e instanceof DisabledException) {
-            errorMsg = "User is disabled";
-        } else if (e instanceof InsufficientAuthenticationException) {
-            errorMsg = "You are not allowed to use this application";
-        }
-        response.getWriter().write(JsonUtils.writeValueAsString(Result.error(errorMsg)));
+        response.getWriter().write(JsonUtils.writeValueAsString(Result.error(e.getMessage())));
     }
 
 }
