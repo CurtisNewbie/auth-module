@@ -1,5 +1,6 @@
 package com.curtisnewbie.module.auth.processing;
 
+import com.curtisnewbie.common.exceptions.UnrecoverableException;
 import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
 import com.curtisnewbie.service.auth.remote.feign.UserServiceFeign;
@@ -8,6 +9,7 @@ import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -48,19 +50,25 @@ public class RemoteAuthenticator implements Authenticator {
                 .appName(applicationName)
                 .build();
 
-        // attempt to authenticate, we may also validate whether current user has the right to use current application
-        final Result<UserVo> userResult;
-        if (moduleConfig.isAppAuthorizationChecked())
-            userResult = remoteUserService.loginForApp(loginVo);
-        else
-            userResult = remoteUserService.login(loginVo);
+        try {
+            // attempt to authenticate, we may also validate whether current user has the right to use current application
+            final Result<UserVo> userResult;
+            if (moduleConfig.isAppAuthorizationChecked())
+                userResult = remoteUserService.loginForApp(loginVo);
+            else
+                userResult = remoteUserService.login(loginVo);
 
-        // throw exception if notOk
-        userResult.assertIsOk();
-        nonNull(userResult.getData(), format("Unable to find user '%s'", username));
+            // throw exception if notOk
+            userResult.assertIsOk();
+            nonNull(userResult.getData(), format("Unable to find user '%s'", username));
 
-        log.info("User '{}' authenticated", username);
-        return buildSuccessfulAuthentication(userResult.getData(), auth);
+            log.info("User '{}' authenticated", username);
+            return buildSuccessfulAuthentication(userResult.getData(), auth);
+        } catch (UnrecoverableException e) {
+            // this is thrown for auth-service, since it's no longer using feign but a local bean
+            // the embeddedMsg is pass to the failure handler, which then convert it back to a normal response object
+            throw new InsufficientAuthenticationException(e.getEmbeddedMsg());
+        }
     }
 
     @Override
