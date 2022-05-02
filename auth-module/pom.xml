@@ -9,6 +9,7 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
+  <version>2.0.8-SNAPSHOT</version>
   <artifactId>auth-module</artifactId>
   <name>auth-module</name>
   <description>Simple authentication module for microservices</description>

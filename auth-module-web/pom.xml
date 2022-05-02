@@ -9,6 +9,7 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
+  <version>2.0.8-SNAPSHOT</version>
   <artifactId>auth-module-web</artifactId>
   <name>auth-module-web</name>
   <description>Authentication web module that provides common reusable REST endpoints</description>
