@@ -42,12 +42,10 @@ public class RemoteAuthenticator implements Authenticator {
 
     @Value("${spring.application.name}")
     private String applicationName;
-    @Value("${auth-service.login.url:http://auth-service/open/api/user/login}")
-    private String loginUrl;
 
     @PostConstruct
     public void _doPostConstruct() {
-        log.info("Remote Authenticator will use auth-service login url: '{}'", loginUrl);
+        log.info("Remote Authenticator will use auth-service login url: '{}'", moduleConfig.getAuthServiceLoginUrl());
     }
 
     @Override
@@ -81,7 +79,7 @@ public class RemoteAuthenticator implements Authenticator {
     protected Result<UserVo> sendLoginRequest(LoginVo loginVo) {
         final ParameterizedTypeReference<Result<UserVo>> resultType = new ParameterizedTypeReference<Result<UserVo>>() {
         };
-        return restTemplate.exchange(loginUrl, HttpMethod.POST, new HttpEntity<>(loginVo), resultType)
+        return restTemplate.exchange(moduleConfig.getAuthServiceLoginUrl(), HttpMethod.POST, new HttpEntity<>(loginVo), resultType)
                 .getBody();
     }
 

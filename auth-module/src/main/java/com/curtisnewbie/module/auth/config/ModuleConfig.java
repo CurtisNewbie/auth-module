@@ -34,11 +34,12 @@ import org.springframework.web.client.RestTemplate;
 public class ModuleConfig {
 
     private String[] permittedAntPatterns = new String[]{};
-    private String loginProcessingUrl = null;
-    private String customLoginPage = null;
-    private String logoutUrl = null;
+    private String loginProcessingUrl = "/login";
+    private String customLoginPage = "/login";
+    private String logoutUrl = "logout";
     private boolean enableAccessLog = true;
     private boolean permitAdminLoginOnly = false;
+    private String authServiceLoginUrl = "http://auth-service/open/api/user/login";
 
     @Autowired
     private Environment environment;
