@@ -5,23 +5,16 @@
   <parent>
     <groupId>com.curtisnewbie</groupId>
     <artifactId>auth-module-parent</artifactId>
-    <version>2.0.7-SNAPSHOT</version>
+    <version>2.0.8-SNAPSHOT</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
-  <groupId>com.curtisnewbie</groupId>
   <artifactId>auth-module</artifactId>
   <name>auth-module</name>
   <description>Simple authentication module for microservices</description>
 
   <properties>
     <java.version>1.8</java.version>
-    <log-tracing-module.version>2.0.2-SNAPSHOT</log-tracing-module.version>
-    <common-module.version>2.0.8-SNAPSHOT</common-module.version>
-    <messaging-module.version>2.0.3-SNAPSHOT</messaging-module.version>
-    <auth-service-messaging.version>1.0.3-SNAPSHOT</auth-service-messaging.version>
-    <auth-service-remote.version>1.0.10-SNAPSHOT</auth-service-remote.version>
-    <jwt-module.version>1.0.1-SNAPSHOT</jwt-module.version>
   </properties>
 
   <dependencies>
@@ -45,6 +38,12 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

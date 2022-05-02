@@ -1,20 +1,23 @@
 package com.curtisnewbie.module.auth.processing;
 
-import com.curtisnewbie.common.exceptions.UnrecoverableException;
 import com.curtisnewbie.common.vo.Result;
 import com.curtisnewbie.module.auth.config.ModuleConfig;
-import com.curtisnewbie.service.auth.remote.feign.UserServiceFeign;
 import com.curtisnewbie.service.auth.remote.vo.LoginVo;
 import com.curtisnewbie.service.auth.remote.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 
 import static com.curtisnewbie.common.util.AssertUtils.nonNull;
@@ -32,13 +35,20 @@ import static java.lang.String.format;
 public class RemoteAuthenticator implements Authenticator {
 
     @Autowired
-    private UserServiceFeign remoteUserService;
+    private RestTemplate restTemplate;
 
     @Autowired
     private ModuleConfig moduleConfig;
 
     @Value("${spring.application.name}")
     private String applicationName;
+    @Value("${auth-service.login.url:http://auth-service/open/api/user/login}")
+    private String loginUrl;
+
+    @PostConstruct
+    public void _doPostConstruct() {
+        log.info("Remote Authenticator will use auth-service login url: '{}'", loginUrl);
+    }
 
     @Override
     public AuthenticationResult authenticate(Authentication auth) {
@@ -50,30 +60,29 @@ public class RemoteAuthenticator implements Authenticator {
                 .appName(applicationName)
                 .build();
 
-        try {
-            // attempt to authenticate, we may also validate whether current user has the right to use current application
-            final Result<UserVo> userResult;
-            if (moduleConfig.isAppAuthorizationChecked())
-                userResult = remoteUserService.loginForApp(loginVo);
-            else
-                userResult = remoteUserService.login(loginVo);
+        // attempt to authenticate but sending requests to auth-service
+        final Result<UserVo> userResult = sendLoginRequest(loginVo);
 
-            // throw exception if notOk
-            userResult.assertIsOk();
-            nonNull(userResult.getData(), format("Unable to find user '%s'", username));
+        // throw exception if notOk
+        Assert.notNull(userResult, "Result<UserVo> == null");
+        userResult.assertIsOk();
+        nonNull(userResult.getData(), format("Unable to find user '%s'", username));
 
-            log.info("User '{}' authenticated", username);
-            return buildSuccessfulAuthentication(userResult.getData(), auth);
-        } catch (UnrecoverableException e) {
-            // this is thrown for auth-service, since it's no longer using feign but a local bean
-            // the embeddedMsg is pass to the failure handler, which then convert it back to a normal response object
-            throw new InsufficientAuthenticationException(e.getEmbeddedMsg());
-        }
+        log.info("User '{}' authenticated", username);
+        return buildSuccessfulAuthentication(userResult.getData(), auth);
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
         return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+
+    /** Send login request to auth-service */
+    protected Result<UserVo> sendLoginRequest(LoginVo loginVo) {
+        final ParameterizedTypeReference<Result<UserVo>> resultType = new ParameterizedTypeReference<Result<UserVo>>() {
+        };
+        return restTemplate.exchange(loginUrl, HttpMethod.POST, new HttpEntity<>(loginVo), resultType)
+                .getBody();
     }
 
     /** Build successful Authentication */

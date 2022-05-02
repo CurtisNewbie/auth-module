@@ -13,14 +13,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
+import static java.util.Collections.singletonList;
 
 /**
  * Authenticator that relies on JWT
@@ -39,9 +38,6 @@ public class JwtAuthenticator implements Authenticator {
 
     @Value("${spring.application.name}")
     private String applicationName;
-
-    @Autowired
-    private UserAppServiceFeign userAppServiceFeign;
 
     @Override
     public AuthenticationResult authenticate(Authentication auth) throws AuthenticationException {
@@ -63,21 +59,9 @@ public class JwtAuthenticator implements Authenticator {
         Assert.notNull(userVo.getUsername(), "username == null");
         Assert.notNull(userVo.getRole(), "role == null");
 
-        boolean isUserAllowed = true;
-
-        if (moduleConfig.isAppAuthorizationChecked())
-            isUserAllowed = decoded.getClaims().containsKey("appNames") &&
-                    Arrays.stream(decoded.getClaim("appNames").asString().split(","))
-                            .anyMatch(name -> name.equals(applicationName));
-
-        if (!isUserAllowed) {
-            log.info("User '{}' not allowed to use this application", userVo.getUsername());
-            throw new InsufficientAuthenticationException("User '" + userVo.getUsername() + "' not allowed to use this application");
-        }
-
         JwtAuthenticationToken token = new JwtAuthenticationToken(encoded,
                 userVo,
-                Arrays.asList(new SimpleGrantedAuthority(userVo.getRole().getValue())));
+                singletonList(new SimpleGrantedAuthority(userVo.getRole().getValue())));
         return new AuthenticationResult(token, userVo);
     }
 

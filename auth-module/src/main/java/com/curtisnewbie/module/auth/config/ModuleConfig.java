@@ -4,8 +4,11 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * <p>
@@ -18,6 +21,7 @@ import org.springframework.core.env.Environment;
  *     <li>{@code authmodule.login-processing-url }: custom login processing url</li>
  *     <li>{@code authmodule.custom-login-page }: url of custom login page</li>
  *     <li>{@code authmodule.logout-url }: logout url</li>
+ *     <li>{@code authmodule.enableAccessLog }: enable access log</li>
  * </ul>
  * </p>
  *
@@ -35,10 +39,15 @@ public class ModuleConfig {
     private String logoutUrl = null;
     private boolean enableAccessLog = true;
     private boolean permitAdminLoginOnly = false;
-    private boolean appAuthorizationChecked = false;
 
     @Autowired
     private Environment environment;
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
     /**
      * Check if a custom login page is specified
